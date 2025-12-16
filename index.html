@@ -79,7 +79,6 @@
         .rank-pill-kill { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
         .rank-pill-cap { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
         
-        /* 滚动条美化 */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
@@ -103,15 +102,13 @@
         <div class="glass-panel p-8 rounded-xl max-w-md w-full shadow-2xl">
             <h2 class="text-xl font-bold mb-2 text-white text-center" id="lbl_select_player_title">Identity Confirmation</h2>
             <p class="text-sm text-slate-400 mb-6 text-center" id="lbl_select_player_desc">Multiple players have identical match history. Please select yourself:</p>
-            
-            <div id="playerSelectList" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto">
-                </div>
+            <div id="playerSelectList" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto"></div>
             <button onclick="closePlayerModal()" class="mt-4 w-full py-2 text-xs text-slate-500 hover:text-white transition">Cancel</button>
         </div>
     </div>
 
     <div class="w-full max-w-5xl flex justify-between items-center mb-4 px-2">
-        <div class="text-xs text-slate-500">v1.5 Team Detection</div>
+        <div class="text-xs text-slate-500">v1.6 By Zola</div>
         <div class="flex gap-2">
             <button onclick="setLanguage('en')" id="btn_en" class="lang-btn">EN</button>
             <button onclick="setLanguage('zh')" id="btn_zh" class="lang-btn">中文</button>
@@ -121,8 +118,9 @@
 
     <div class="glass-panel w-full max-w-5xl rounded-2xl p-8">
         <div class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2 flex items-baseline justify-center">
                 <span id="lbl_title">断箭蛆指数</span>
+                <span class="text-sm font-normal text-slate-500 ml-3 italic">By Zola</span>
             </h1>
             <p class="text-slate-400 text-sm" id="lbl_subtitle">Broken Arrow Maggot Index</p>
             
@@ -164,9 +162,13 @@
                     </div>
 
                     <h2 class="text-xl font-bold text-slate-300 mb-2" id="lbl_maggot_index">蛆指数 (Maggot Index)</h2>
-                    <div class="text-6xl font-black mb-2" id="maggotScoreDisplay" style="text-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                    <div class="text-6xl font-black mb-1" id="maggotScoreDisplay" style="text-shadow: 0 0 20px rgba(0,0,0,0.5);">
                         -
                     </div>
+                    
+                    <div id="currentPlayerName" class="text-xl text-cyan-300 font-bold mb-3 px-4 py-1 rounded-full bg-slate-900/50 border border-slate-700/50">
+                        </div>
+
                     <div class="text-lg font-bold mb-4" id="maggotLabel">Unknown</div>
                     
                     <div class="w-full max-w-lg">
@@ -219,6 +221,19 @@
     </div>
 
     <script>
+        // ================= 工具：HTML 转义（防御奇怪名字） =================
+        function escapeHtml(text) {
+            if (!text) return text;
+            // 将非字符串转换为字符串
+            const str = String(text);
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         // ================= 配置与语言包 =================
         const translations = {
             zh: {
@@ -317,7 +332,7 @@
         };
 
         let currentLang = 'zh';
-        let cachedMatches = []; // 暂存数据用于手动选择后的回调
+        let cachedMatches = [];
 
         // ================= Cookie 工具 =================
         function setCookie(name, value, days) {
@@ -459,8 +474,15 @@
                 return;
             }
 
-            // 修改点：只保留最近10局
-            const recentMatches = matches.slice(-10);
+            // 修改：按 EndTime 倒序排序 (最近的在前)
+            matches.sort((a, b) => {
+                const timeA = (a.data && a.data.EndTime) ? a.data.EndTime : 0;
+                const timeB = (b.data && b.data.EndTime) ? b.data.EndTime : 0;
+                return timeB - timeA;
+            });
+
+            // 截取最近10局
+            const recentMatches = matches.slice(0, 10);
             cachedMatches = recentMatches;
 
             // 智能识别玩家 ID
@@ -471,18 +493,16 @@
                 if(m.data && m.data.Data) {
                     Object.values(m.data.Data).forEach(p => {
                         idCounts[p.Id] = (idCounts[p.Id] || 0) + 1;
-                        if (p.Name) idNames[p.Id] = p.Name; // 只要有一次有名字就记录
+                        if (p.Name) idNames[p.Id] = p.Name; 
                     });
                 }
             });
 
-            // 找出出现次数最多的次数 (maxCount)
             let maxCount = 0;
             for (const count of Object.values(idCounts)) {
                 if (count > maxCount) maxCount = count;
             }
 
-            // 找出所有出现次数等于 maxCount 的候选人
             const candidates = [];
             for (const [id, count] of Object.entries(idCounts)) {
                 if (count === maxCount) {
@@ -496,10 +516,8 @@
             if (candidates.length === 0) {
                 showError(t.err_data);
             } else if (candidates.length === 1) {
-                // 只有一个人选，直接分析
                 analyzeData(candidates[0].id);
             } else {
-                // 有多个人选，弹出选择框
                 showPlayerSelectModal(candidates);
             }
         }
@@ -514,12 +532,16 @@
             candidates.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = "w-full text-left p-4 rounded bg-slate-700 hover:bg-cyan-700 hover:shadow-lg transition border border-slate-600 flex justify-between items-center group";
+                
+                // 使用 escapeHtml 防止乱码或XSS
+                const safeName = escapeHtml(c.name);
+                
                 btn.innerHTML = `
-                    <div>
-                        <div class="font-bold text-white group-hover:text-white">${c.name}</div>
+                    <div class="overflow-hidden">
+                        <div class="font-bold text-white group-hover:text-white truncate pr-2">${safeName}</div>
                         <div class="text-xs text-slate-400">ID: ${c.id}</div>
                     </div>
-                    <div class="text-xs px-3 py-1 bg-slate-800 rounded text-slate-300 group-hover:bg-cyan-600 group-hover:text-white transition">
+                    <div class="text-xs px-3 py-1 bg-slate-800 rounded text-slate-300 group-hover:bg-cyan-600 group-hover:text-white transition flex-shrink-0">
                         ${t.me}
                     </div>
                 `;
@@ -540,6 +562,7 @@
         function analyzeData(mainPlayerId) {
             const t = translations[currentLang];
             const stats = [];
+            let mainPlayerName = "";
 
             cachedMatches.forEach(match => {
                 if (!match.data || !match.data.Data || !match.data.Data[mainPlayerId]) return;
@@ -547,10 +570,12 @@
                 const data = match.data.Data;
                 const me = data[mainPlayerId];
                 const myTeam = me.TeamId;
+                
+                // 记录名字（取最新一局或任意一局的有名字的）
+                if (me.Name) mainPlayerName = me.Name;
 
                 let teammates = Object.values(data).filter(p => p.TeamId == myTeam);
                 
-                // 1. 计算总贡献排名
                 const processed = teammates.map(p => {
                     const d = p.DestructionScore || 0;
                     const l = p.LossesScore || 0;
@@ -567,16 +592,13 @@
                     };
                 });
                 
-                // 按总分排序
                 processed.sort((a, b) => b.totalScore - a.totalScore);
                 const myRank = processed.findIndex(p => p.isMe) + 1;
                 const myEntry = processed.find(p => p.isMe);
 
-                // 2. 计算击杀排名 (Kill Only)
                 const killSorted = [...processed].sort((a, b) => b.killScore - a.killScore);
                 const myKillRank = killSorted.findIndex(p => p.isMe) + 1;
 
-                // 3. 计算占点排名 (Cap Only)
                 const capSorted = [...processed].sort((a, b) => b.capScore - a.capScore);
                 const myCapRank = capSorted.findIndex(p => p.isMe) + 1;
                 
@@ -586,9 +608,18 @@
                     myKillRank: myKillRank,
                     myCapRank: myCapRank,
                     teamSize: processed.length,
-                    teamDetails: processed // 保存的是按总分排序的列表
+                    teamDetails: processed
                 });
             });
+            
+            // 显示名字
+            const nameEl = document.getElementById('currentPlayerName');
+            if (mainPlayerName) {
+                nameEl.innerHTML = escapeHtml(mainPlayerName);
+                nameEl.classList.remove('hidden');
+            } else {
+                nameEl.innerHTML = `ID: ${mainPlayerId}`;
+            }
 
             renderResults(stats);
         }
@@ -604,19 +635,16 @@
             const avgKillRank = stats.reduce((sum, s) => sum + s.myKillRank, 0) / stats.length;
             const avgCapRank = stats.reduce((sum, s) => sum + s.myCapRank, 0) / stats.length;
 
-            // U-Curve / S-Curve 映射
             const normalizedRank = (avgRank - 1) / 4; 
             const clampedNorm = Math.max(0, Math.min(1, normalizedRank));
             const sCurveValue = (1 - Math.cos(clampedNorm * Math.PI)) / 2;
             let maggotIndex = 1 + sCurveValue * 9;
             
-            // 边界修正
             if (maggotIndex < 1) maggotIndex = 1;
             if (maggotIndex > 10) maggotIndex = 10;
 
             document.getElementById('resultPanel').classList.remove('hidden');
             
-            // 1. 风格标签
             const tagEl = document.getElementById('playstyleTag');
             if (avgKillRank <= avgCapRank) {
                 tagEl.innerText = t.tag_killer;
@@ -626,13 +654,12 @@
                 tagEl.className = "absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold border transform rotate-3 bg-blue-900/80 border-blue-500 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]";
             }
 
-            // 2. 蛆指数
             const scoreEl = document.getElementById('maggotScoreDisplay');
             scoreEl.innerText = maggotIndex.toFixed(1);
             
-            if (maggotIndex <= 3) scoreEl.className = "text-6xl font-black mb-2 text-green-400";
-            else if (maggotIndex <= 7) scoreEl.className = "text-6xl font-black mb-2 text-yellow-400";
-            else scoreEl.className = "text-6xl font-black mb-2 text-red-500";
+            if (maggotIndex <= 3) scoreEl.className = "text-6xl font-black mb-1 text-green-400";
+            else if (maggotIndex <= 7) scoreEl.className = "text-6xl font-black mb-1 text-yellow-400";
+            else scoreEl.className = "text-6xl font-black mb-1 text-red-500";
 
             let labelIndex = 0;
             if (maggotIndex <= 2) labelIndex = 0;
@@ -645,17 +672,16 @@
             const percentage = ((maggotIndex - 1) / 9) * 100;
             document.getElementById('meterIndicator').style.left = `${percentage}%`;
 
-            // 3. 基础数据
             document.getElementById('avgRank').innerText = avgRank.toFixed(1);
             document.getElementById('avgKillRank').innerText = avgKillRank.toFixed(1);
             document.getElementById('avgCapRank').innerText = avgCapRank.toFixed(1);
             document.getElementById('matchCount').innerText = stats.length;
 
-            // 4. 表格渲染
             const tbody = document.getElementById('matchTableBody');
             tbody.innerHTML = "";
             
-            [...stats].reverse().forEach((s) => {
+            // 保持时间倒序显示（最近的在上面）
+            stats.forEach((s) => {
                 const tr = document.createElement('tr');
                 tr.className = "match-row bg-slate-800 border-b border-slate-700";
                 
@@ -666,9 +692,11 @@
                 let teamHtml = `<div class="flex flex-col gap-1">`;
                 s.teamDetails.forEach(p => {
                     const isMeClass = p.isMe ? "is-me" : "text-slate-400";
+                    // 名字也要转义
+                    const safeTeammateName = escapeHtml(p.name);
                     teamHtml += `
                         <div class="teammate-badge ${isMeClass}">
-                            <span class="truncate max-w-[120px]">${p.name}</span>
+                            <span class="truncate max-w-[120px]">${safeTeammateName}</span>
                             <span>${p.totalScore.toFixed(2)}</span>
                         </div>
                     `;
