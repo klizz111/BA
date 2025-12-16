@@ -83,6 +83,23 @@
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 标签动画 */
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px) rotate(1deg); }
+            to { opacity: 1; transform: translateX(0) rotate(1deg); }
+        }
+        .tag-animation {
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+        
+        /* 酷炫名字样式 */
+        .cool-name {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 0 10px rgba(6, 182, 212, 0.1);
+            text-shadow: 0 0 5px rgba(34, 211, 238, 0.8);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center pt-10 px-4 pb-10">
@@ -108,7 +125,7 @@
     </div>
 
     <div class="w-full max-w-5xl flex justify-between items-center mb-4 px-2">
-        <div class="text-xs text-slate-500">v1.6 By Zola</div>
+        <div class="text-xs text-slate-500">v1.8 Smart Filter</div>
         <div class="flex gap-2">
             <button onclick="setLanguage('en')" id="btn_en" class="lang-btn">EN</button>
             <button onclick="setLanguage('zh')" id="btn_zh" class="lang-btn">中文</button>
@@ -157,16 +174,19 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-slate-800/80 rounded-xl p-6 border border-slate-700 col-span-1 md:col-span-4 flex flex-col items-center relative overflow-hidden">
                     
-                    <div id="playstyleTag" class="absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold border transform rotate-3">
-                        STYLE
-                    </div>
+                    <div id="tagsContainer" class="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                        </div>
 
                     <h2 class="text-xl font-bold text-slate-300 mb-2" id="lbl_maggot_index">蛆指数 (Maggot Index)</h2>
                     <div class="text-6xl font-black mb-1" id="maggotScoreDisplay" style="text-shadow: 0 0 20px rgba(0,0,0,0.5);">
                         -
                     </div>
                     
-                    <div id="currentPlayerName" class="text-xl text-cyan-300 font-bold mb-3 px-4 py-1 rounded-full bg-slate-900/50 border border-slate-700/50">
+                    <div class="text-[10px] text-slate-600 font-mono mb-2" id="calcTime">
+                        Calculated at: --:--:--
+                    </div>
+
+                    <div id="currentPlayerName" class="cool-name text-2xl text-cyan-300 font-bold mb-4 px-6 py-2 rounded-lg tracking-wide">
                         </div>
 
                     <div class="text-lg font-bold mb-4" id="maggotLabel">Unknown</div>
@@ -221,10 +241,8 @@
     </div>
 
     <script>
-        // ================= 工具：HTML 转义（防御奇怪名字） =================
         function escapeHtml(text) {
             if (!text) return text;
-            // 将非字符串转换为字符串
             const str = String(text);
             return str
                 .replace(/&/g, "&amp;")
@@ -234,7 +252,6 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // ================= 配置与语言包 =================
         const translations = {
             zh: {
                 title: "断箭蛆指数",
@@ -248,7 +265,7 @@
                 lbl_avg_rank_total: "平均综合排名",
                 lbl_avg_rank_kill: "平均击杀排名",
                 lbl_avg_rank_cap: "平均占点排名",
-                matches: "统计局数 (最近10场)",
+                matches: "统计局数 (12场)",
                 history: "最近战绩明细",
                 th_score: "我的贡献",
                 th_team_details: "队伍详情 (ID: 分数)",
@@ -257,11 +274,15 @@
                 err_network: "网络请求失败",
                 err_data: "未能解析到有效数据",
                 err_no_matches: "未找到对局数据",
+                err_insufficient: "对局不足12局，无法计算",
                 label_carry: "CARRY",
                 label_normal: "普通",
                 label_pot: "背锅",
                 tag_killer: "⚔️ 击杀达人",
                 tag_capper: "🚩 占点达人",
+                tag_trend_up: "📈 最近状态变好",
+                tag_trend_down: "📉 最近状态不佳",
+                tag_trend_flat: "➡️ 最近状态平稳",
                 maggot_levels: ["👑 绝世大腿 / 疑似开挂", "🦁 团队中坚", "😐 也就是个混子", "🐛 只有一点蛆", "💩 纯种蛆王"],
                 sel_title: "身份确认",
                 sel_desc: "发现多名玩家场次相同（疑似组队），请确认哪一位是您：",
@@ -279,7 +300,7 @@
                 lbl_avg_rank_total: "Avg Team Rank",
                 lbl_avg_rank_kill: "Avg Kill Rank",
                 lbl_avg_rank_cap: "Avg Cap Rank",
-                matches: "Matches (Last 10)",
+                matches: "Matches (12 Games)",
                 history: "Recent Match Details",
                 th_score: "My Score",
                 th_team_details: "Team Details (Sorted by Score)",
@@ -288,11 +309,15 @@
                 err_network: "Network request failed",
                 err_data: "Failed to parse data",
                 err_no_matches: "No matches found",
+                err_insufficient: "Insufficient matches (need 12 valid games)",
                 label_carry: "CARRY",
                 label_normal: "NORMAL",
                 label_pot: "SCAPEGOAT",
                 tag_killer: "⚔️ TERMINATOR",
                 tag_capper: "🚩 OBJ MASTER",
+                tag_trend_up: "📈 IMPROVING",
+                tag_trend_down: "📉 DECLINING",
+                tag_trend_flat: "➡️ STABLE",
                 maggot_levels: ["👑 GODLIKE", "🦁 TEAM CARRY", "😐 AVERAGE JOE", "🐛 BIT OF A MAGGOT", "💩 PURE MAGGOT"],
                 sel_title: "Identify Yourself",
                 sel_desc: "Multiple players have identical match history. Please select yourself:",
@@ -310,7 +335,7 @@
                 lbl_avg_rank_total: "Ср. ранг",
                 lbl_avg_rank_kill: "Ранг убийств",
                 lbl_avg_rank_cap: "Ранг точек",
-                matches: "Матчей (Посл. 10)",
+                matches: "Матчей (12 игр)",
                 history: "История матчей",
                 th_score: "Мой счет",
                 th_team_details: "Команда (по счету)",
@@ -319,11 +344,15 @@
                 err_network: "Ошибка сети",
                 err_data: "Ошибка данных",
                 err_no_matches: "Матчи не найдены",
+                err_insufficient: "Недостаточно матчей (нужно 12)",
                 label_carry: "ТАЩЕР",
                 label_normal: "НОРМ",
                 label_pot: "ВАГОН",
                 tag_killer: "⚔️ УБИЙЦА",
                 tag_capper: "🚩 ЗАХВАТЧИК",
+                tag_trend_up: "📈 УЛУЧШЕНИЕ",
+                tag_trend_down: "📉 УХУДШЕНИЕ",
+                tag_trend_flat: "➡️ СТАБИЛЬНО",
                 maggot_levels: ["👑 БОГ", "🦁 ТАЩЕР", "😐 СРЕДНЯЧОК", "🐛 НЕМНОГО ЛИЧИНКА", "💩 100% ЛИЧИНКА"],
                 sel_title: "Подтверждение",
                 sel_desc: "Несколько игроков имеют одинаковую историю. Выберите себя:",
@@ -332,9 +361,8 @@
         };
 
         let currentLang = 'zh';
-        let cachedMatches = [];
+        let sortedAllMatches = []; // 存储所有排序后的对局，用于递归查找
 
-        // ================= Cookie 工具 =================
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -352,7 +380,6 @@
             return null;
         }
 
-        // ================= 初始化 =================
         window.onload = function() {
             const savedLang = getCookie('lang');
             if (savedLang) {
@@ -404,7 +431,6 @@
             setText('lbl_select_player_desc', t.sel_desc);
         }
 
-        // ================= 核心逻辑 =================
         function parseTruncatedJSON(content) {
             const objects = [];
             let depth = 0;
@@ -474,22 +500,22 @@
                 return;
             }
 
-            // 修改：按 EndTime 倒序排序 (最近的在前)
+            // 按 EndTime 倒序
             matches.sort((a, b) => {
                 const timeA = (a.data && a.data.EndTime) ? a.data.EndTime : 0;
                 const timeB = (b.data && b.data.EndTime) ? b.data.EndTime : 0;
                 return timeB - timeA;
             });
+            
+            // 存储全局数据，用于后续过滤查找
+            sortedAllMatches = matches;
 
-            // 截取最近10局
-            const recentMatches = matches.slice(0, 10);
-            cachedMatches = recentMatches;
-
-            // 智能识别玩家 ID
+            // 智能识别玩家 ID (先用前20局来识别，足够了)
+            const sampleMatches = matches.slice(0, 20);
             const idCounts = {};
-            const idNames = {}; // 记录 ID 对应的名字
+            const idNames = {}; 
 
-            recentMatches.forEach(m => {
+            sampleMatches.forEach(m => {
                 if(m.data && m.data.Data) {
                     Object.values(m.data.Data).forEach(p => {
                         idCounts[p.Id] = (idCounts[p.Id] || 0) + 1;
@@ -532,10 +558,7 @@
             candidates.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = "w-full text-left p-4 rounded bg-slate-700 hover:bg-cyan-700 hover:shadow-lg transition border border-slate-600 flex justify-between items-center group";
-                
-                // 使用 escapeHtml 防止乱码或XSS
                 const safeName = escapeHtml(c.name);
-                
                 btn.innerHTML = `
                     <div class="overflow-hidden">
                         <div class="font-bold text-white group-hover:text-white truncate pr-2">${safeName}</div>
@@ -561,21 +584,30 @@
 
         function analyzeData(mainPlayerId) {
             const t = translations[currentLang];
-            const stats = [];
+            const validStats = [];
             let mainPlayerName = "";
+            let idx = 0;
+            
+            // 循环直到找到12个有效对局或没有更多数据
+            while (validStats.length < 12 && idx < sortedAllMatches.length) {
+                const match = sortedAllMatches[idx];
+                idx++;
 
-            cachedMatches.forEach(match => {
-                if (!match.data || !match.data.Data || !match.data.Data[mainPlayerId]) return;
+                if (!match.data || !match.data.Data || !match.data.Data[mainPlayerId]) continue;
 
                 const data = match.data.Data;
                 const me = data[mainPlayerId];
                 const myTeam = me.TeamId;
                 
-                // 记录名字（取最新一局或任意一局的有名字的）
                 if (me.Name) mainPlayerName = me.Name;
 
                 let teammates = Object.values(data).filter(p => p.TeamId == myTeam);
                 
+                // 【关键逻辑】过滤掉不足5人的对局
+                if (teammates.length < 5) {
+                    continue; // 跳过此局，继续找下一局
+                }
+
                 const processed = teammates.map(p => {
                     const d = p.DestructionScore || 0;
                     const l = p.LossesScore || 0;
@@ -602,7 +634,7 @@
                 const capSorted = [...processed].sort((a, b) => b.capScore - a.capScore);
                 const myCapRank = capSorted.findIndex(p => p.isMe) + 1;
                 
-                stats.push({
+                validStats.push({
                     myScore: myEntry.totalScore,
                     myRank: myRank,
                     myKillRank: myKillRank,
@@ -610,9 +642,14 @@
                     teamSize: processed.length,
                     teamDetails: processed
                 });
-            });
+            }
+
+            // 如果找遍了都不够12局
+            if (validStats.length < 12) {
+                showError(t.err_insufficient + ` (${validStats.length}/12)`);
+                return;
+            }
             
-            // 显示名字
             const nameEl = document.getElementById('currentPlayerName');
             if (mainPlayerName) {
                 nameEl.innerHTML = escapeHtml(mainPlayerName);
@@ -621,16 +658,17 @@
                 nameEl.innerHTML = `ID: ${mainPlayerId}`;
             }
 
-            renderResults(stats);
+            // 更新计算时间
+            const now = new Date();
+            document.getElementById('calcTime').innerText = "Calculated at: " + now.toLocaleTimeString();
+
+            renderResults(validStats);
         }
 
         function renderResults(stats) {
             const t = translations[currentLang];
-            if (stats.length === 0) {
-                showError(t.err_no_matches);
-                return;
-            }
-
+            
+            // 基础数据统计
             const avgRank = stats.reduce((sum, s) => sum + s.myRank, 0) / stats.length;
             const avgKillRank = stats.reduce((sum, s) => sum + s.myKillRank, 0) / stats.length;
             const avgCapRank = stats.reduce((sum, s) => sum + s.myCapRank, 0) / stats.length;
@@ -645,15 +683,50 @@
 
             document.getElementById('resultPanel').classList.remove('hidden');
             
-            const tagEl = document.getElementById('playstyleTag');
+            // --- 标签生成 ---
+            const tagsContainer = document.getElementById('tagsContainer');
+            tagsContainer.innerHTML = ''; 
+
+            // 1. 风格标签
+            const styleTag = document.createElement('div');
+            styleTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg";
             if (avgKillRank <= avgCapRank) {
-                tagEl.innerText = t.tag_killer;
-                tagEl.className = "absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold border transform rotate-3 bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+                styleTag.innerText = t.tag_killer;
+                styleTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
             } else {
-                tagEl.innerText = t.tag_capper;
-                tagEl.className = "absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold border transform rotate-3 bg-blue-900/80 border-blue-500 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]";
+                styleTag.innerText = t.tag_capper;
+                styleTag.className += " bg-blue-900/80 border-blue-500 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]";
+            }
+            tagsContainer.appendChild(styleTag);
+
+            // 2. 走势标签 (最近3局 vs 之前9局)
+            if (stats.length === 12) {
+                const recentStats = stats.slice(0, 3);
+                const prevStats = stats.slice(3, 12);
+                
+                const avgRecent = recentStats.reduce((sum, s) => sum + s.myRank, 0) / recentStats.length;
+                const avgPrev = prevStats.reduce((sum, s) => sum + s.myRank, 0) / prevStats.length;
+                
+                const trendTag = document.createElement('div');
+                // 恢复斜着的效果 rotate-1
+                trendTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg mt-1";
+                trendTag.style.animationDelay = "0.1s";
+
+                // 排名越小越好。 
+                if (avgRecent < avgPrev - 0.3) { // 阈值0.3
+                    trendTag.innerText = t.tag_trend_up; 
+                    trendTag.className += " bg-green-900/80 border-green-500 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.5)]";
+                } else if (avgRecent > avgPrev + 0.3) {
+                    trendTag.innerText = t.tag_trend_down; 
+                    trendTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
+                } else {
+                    trendTag.innerText = t.tag_trend_flat;
+                    trendTag.className += " bg-slate-700/80 border-slate-500 text-slate-300";
+                }
+                tagsContainer.appendChild(trendTag);
             }
 
+            // --- 指数显示 ---
             const scoreEl = document.getElementById('maggotScoreDisplay');
             scoreEl.innerText = maggotIndex.toFixed(1);
             
@@ -680,7 +753,6 @@
             const tbody = document.getElementById('matchTableBody');
             tbody.innerHTML = "";
             
-            // 保持时间倒序显示（最近的在上面）
             stats.forEach((s) => {
                 const tr = document.createElement('tr');
                 tr.className = "match-row bg-slate-800 border-b border-slate-700";
@@ -692,7 +764,6 @@
                 let teamHtml = `<div class="flex flex-col gap-1">`;
                 s.teamDetails.forEach(p => {
                     const isMeClass = p.isMe ? "is-me" : "text-slate-400";
-                    // 名字也要转义
                     const safeTeammateName = escapeHtml(p.name);
                     teamHtml += `
                         <div class="teammate-badge ${isMeClass}">
