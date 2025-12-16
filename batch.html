@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Arrow Maggot Batch - 批量蛆指数</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        .upload-zone {
+            border: 2px dashed rgba(6, 182, 212, 0.4);
+            background: rgba(15, 23, 42, 0.6);
+            transition: all 0.3s;
+        }
+        .upload-zone.dragover {
+            border-color: #22d3ee;
+            background: rgba(6, 182, 212, 0.1);
+        }
+        .card-enter { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        .score-god { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
+        .score-mid { color: #facc15; }
+        .score-maggot { color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex flex-col items-center">
+
+    <div class="w-full max-w-7xl flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            批量蛆指数 <span class="text-xs text-slate-500 font-normal ml-2">AI Vision</span>
+        </h1>
+        <div class="flex gap-3">
+            <button onclick="window.location.href='index.html'" class="px-4 py-2 text-sm rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                单人查询
+            </button>
+            <button onclick="toggleSettings()" class="px-4 py-2 text-sm rounded bg-cyan-900/50 hover:bg-cyan-800/50 border border-cyan-700 text-cyan-100 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                AI 设置
+            </button>
+        </div>
+    </div>
+
+    <div id="settingsPanel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-panel p-6 rounded-xl max-w-md w-full shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 text-white">AI Configuration</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">API Base URL (OpenAI Compatible)</label>
+                    <input type="text" id="cfg_url" placeholder="https://api.openai.com/v1" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:border-cyan-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">API Key</label>
+                    <input type="password" id="cfg_key" placeholder="sk-..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:border-cyan-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Model Name (Vision Supported)</label>
+                    <input type="text" id="cfg_model" placeholder="gpt-5-mini / claude-3-5-sonnet" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:border-cyan-500 outline-none">
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <button onclick="saveSettings()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded text-sm transition">保存</button>
+                <button onclick="toggleSettings()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-300 py-2 rounded text-sm transition">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadZone" class="w-full max-w-7xl h-32 upload-zone rounded-xl flex flex-col items-center justify-center cursor-pointer mb-8 relative overflow-hidden group">
+        <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="handleFileSelect(this)">
+        <div class="text-slate-400 group-hover:text-cyan-400 transition flex flex-col items-center pointer-events-none">
+            <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p class="text-sm font-medium">Ctrl+V 粘贴图片，或拖拽上传</p>
+            <p class="text-xs text-slate-500 mt-1">自动识别 ID 并批量查询</p>
+        </div>
+        <div id="visionLoading" class="hidden absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20">
+            <div class="flex flex-col items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500 mb-2"></div>
+                <p class="text-cyan-400 text-xs animate-pulse">AI 正在识别...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsGrid" class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+    <div class="w-full max-w-7xl mt-4 flex justify-center">
+        <button onclick="addManualCard()" class="text-slate-500 hover:text-cyan-400 text-sm flex items-center gap-1 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            手动添加
+        </button>
+    </div>
+
+    <script>
+        // ================= Settings =================
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                document.getElementById('cfg_url').value = localStorage.getItem('ba_ai_url') || '';
+                document.getElementById('cfg_key').value = localStorage.getItem('ba_ai_key') || '';
+                document.getElementById('cfg_model').value = localStorage.getItem('ba_ai_model') || 'gpt-5-mini';
+            }
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('cfg_url').value.trim().replace(/\/+$/, '');
+            const key = document.getElementById('cfg_key').value.trim();
+            const model = document.getElementById('cfg_model').value.trim();
+            if (!url || !key || !model) { alert("请填写完整配置"); return; }
+            localStorage.setItem('ba_ai_url', url);
+            localStorage.setItem('ba_ai_key', key);
+            localStorage.setItem('ba_ai_model', model);
+            toggleSettings();
+        }
+
+        // ================= Image Processing =================
+        const uploadZone = document.getElementById('uploadZone');
+
+        window.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    processImage(item.getAsFile());
+                    break;
+                }
+            }
+        });
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); });
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) processImage(e.dataTransfer.files[0]);
+        });
+        function handleFileSelect(input) { if (input.files.length) processImage(input.files[0]); }
+
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) { callVisionAPI(e.target.result); };
+            reader.readAsDataURL(file);
+        }
+
+        async function callVisionAPI(base64Image) {
+            const url = localStorage.getItem('ba_ai_url');
+            const key = localStorage.getItem('ba_ai_key');
+            const model = localStorage.getItem('ba_ai_model');
+            if (!url || !key) { toggleSettings(); alert("请先配置 AI API"); return; }
+
+            document.getElementById('visionLoading').classList.remove('hidden');
+            try {
+                const response = await fetch(`${url}/chat/completions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: "system", content: "Identify all player names in the image. Return ONLY a valid JSON array of strings, e.g., [\"Name1\", \"Name2\"]. No markdown." },
+                            { role: "user", content: [{ type: "image_url", image_url: { url: base64Image } }] }
+                        ]
+                    })
+                });
+                const data = await response.json();
+                let content = data.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
+                const names = JSON.parse(content);
+                if (Array.isArray(names)) names.forEach(name => createPlayerCard(name));
+                else alert("AI 返回格式错误");
+            } catch (e) { alert("识别失败: " + e.message); } 
+            finally { document.getElementById('visionLoading').classList.add('hidden'); }
+        }
+
+        // ================= Card Logic =================
+        let cardCounter = 0;
+        function addManualCard() { createPlayerCard(""); }
+        function removeCard(id) { document.getElementById(id).remove(); }
+
+        function createPlayerCard(initialName) {
+            cardCounter++;
+            const cardId = `card-${cardCounter}`;
+            const html = `
+                <div id="${cardId}" class="glass-panel p-4 rounded-lg card-enter relative min-h-[180px] flex flex-col">
+                    <button onclick="removeCard('${cardId}')" class="absolute top-2 right-2 text-slate-600 hover:text-red-400">×</button>
+                    <div class="flex gap-2 mb-4 pr-6">
+                        <input type="text" id="input-${cardId}" value="${initialName}" placeholder="玩家名" 
+                            class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:border-cyan-500 outline-none"
+                            onkeypress="if(event.key === 'Enter') searchPlayer('${cardId}')">
+                        <button onclick="searchPlayer('${cardId}')" class="bg-cyan-700 hover:bg-cyan-600 text-white px-2 rounded text-xs">搜</button>
+                    </div>
+                    <div id="content-${cardId}" class="flex-1 flex flex-col justify-center items-center">
+                        <span class="text-slate-500 text-xs">等待查询...</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsGrid').insertAdjacentHTML('beforeend', html);
+            if (initialName) searchPlayer(cardId);
+        }
+
+        async function searchPlayer(cardId) {
+            const inputVal = document.getElementById(`input-${cardId}`).value.trim();
+            const contentDiv = document.getElementById(`content-${cardId}`);
+            if (!inputVal) return;
+
+            contentDiv.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-cyan-500"></div>`;
+
+            try {
+                // Limit = 8
+                const res = await fetch(`https://batrace.aoeiaol.top/api/v1/search/players?q=${encodeURIComponent(inputVal)}&limit=8`);
+                const data = await res.json();
+                const results = data.results || [];
+
+                if (results.length === 0) {
+                    contentDiv.innerHTML = `<span class="text-red-400 text-xs">未找到玩家</span>`;
+                    return;
+                }
+
+                const exactMatch = results.find(p => p.name.toLowerCase() === inputVal.toLowerCase());
+                
+                // 只有一个结果 或 精确匹配且干扰少
+                if (results.length === 1 || (exactMatch && results.length < 3)) {
+                    const target = exactMatch || results[0];
+                    // 传递 Level 信息
+                    calculateMaggot(cardId, target.steam_id, target.name, target.level);
+                } else {
+                    renderSelectionList(cardId, results);
+                }
+            } catch (e) { contentDiv.innerHTML = `<span class="text-red-400 text-xs">API Error</span>`; }
+        }
+
+        function renderSelectionList(cardId, players) {
+            const contentDiv = document.getElementById(`content-${cardId}`);
+            let html = `<div class="w-full flex flex-col gap-1 overflow-y-auto max-h-[150px]">`;
+            players.forEach(p => {
+                // 列表中显示 Level，点击时传递 Level
+                html += `
+                    <button onclick="calculateMaggot('${cardId}', '${p.steam_id}', '${escapeHtml(p.name)}', ${p.level})" 
+                        class="text-left px-2 py-1.5 bg-slate-800 hover:bg-cyan-900/50 rounded border border-slate-700 text-xs flex justify-between items-center group">
+                        <span class="truncate max-w-[100px] text-slate-300 group-hover:text-white">${escapeHtml(p.name)}</span>
+                        <span class="text-[10px] text-yellow-500 border border-yellow-800/50 px-1 rounded">Lv.${p.level}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+            contentDiv.innerHTML = html;
+        }
+
+        async function calculateMaggot(cardId, steamId, playerName, playerLevel) {
+            const contentDiv = document.getElementById(`content-${cardId}`);
+            document.getElementById(`input-${cardId}`).value = playerName;
+            
+            contentDiv.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500 mb-2"></div>
+                    <span class="text-xs text-slate-400">正在分析战绩...</span>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`https://batrace.aoeiaol.top/api/v1/matches_steam64?steam64=${steamId}`);
+                const rawText = await res.text();
+                const allObjects = parseJSON(rawText);
+                const matches = allObjects.filter(obj => obj.type === 'match');
+
+                if (matches.length < 5) {
+                    contentDiv.innerHTML = `<span class="text-yellow-500 text-xs">战绩不足 (${matches.length})</span>`;
+                    return;
+                }
+
+                matches.sort((a, b) => (b.data?.EndTime || 0) - (a.data?.EndTime || 0));
+                const stats = processMatches(matches);
+
+                if (stats.validMatches < 5) {
+                    contentDiv.innerHTML = `<span class="text-yellow-500 text-xs">有效局数不足</span>`;
+                    return;
+                }
+
+                // 渲染结果时传入 Level
+                renderResultCard(cardId, stats, steamId, playerLevel);
+
+            } catch (e) {
+                console.error(e);
+                contentDiv.innerHTML = `<span class="text-red-400 text-xs">获取失败</span>`;
+            }
+        }
+
+        function parseJSON(content) {
+            const objects = [];
+            let idx = content.indexOf('[');
+            if (idx === -1) { try { return [JSON.parse(content)]; } catch(e) { return []; } }
+            idx += 1;
+            let depth = 0;
+            let objStart = -1;
+            while (idx < content.length) {
+                if (content[idx] === '{') {
+                    if (depth === 0) objStart = idx;
+                    depth++;
+                } else if (content[idx] === '}') {
+                    depth--;
+                    if (depth === 0) {
+                        try { objects.push(JSON.parse(content.substring(objStart, idx + 1))); } catch (e) {}
+                    }
+                }
+                idx++;
+            }
+            return objects;
+        }
+
+        function processMatches(matches) {
+            let validMatches = 0, totalRank = 0, killRankSum = 0, capRankSum = 0;
+            const history = [];
+            
+            const idFrequency = {};
+            matches.slice(0, 20).forEach(m => {
+                if (m.data?.Data) Object.keys(m.data.Data).forEach(id => {
+                    idFrequency[id] = (idFrequency[id] || 0) + 1;
+                });
+            });
+            let playerId = Object.keys(idFrequency).reduce((a, b) => idFrequency[a] > idFrequency[b] ? a : b);
+
+            for (const m of matches) {
+                if (validMatches >= 12) break;
+                if (!m.data?.Data || !m.data.Data[playerId]) continue;
+
+                const data = m.data.Data;
+                const me = data[playerId];
+                const teammates = Object.values(data).filter(p => p.TeamId === me.TeamId);
+
+                if (teammates.length < 5) continue;
+
+                const processed = teammates.map(p => {
+                    const d = p.DestructionScore || 0;
+                    const l = p.LossesScore || 0;
+                    const obj = p.ObjectivesCaptured || 0;
+                    const kill = (d - l) / 1000;
+                    return { id: p.Id, score: kill + obj, killScore: kill, capScore: obj, isMe: p.Id == playerId };
+                });
+                
+                if (processed.every(p => p.score === 0)) continue;
+
+                processed.sort((a, b) => b.score - a.score);
+                const myRank = processed.findIndex(p => p.isMe) + 1;
+                
+                const killSorted = [...processed].sort((a, b) => b.killScore - a.killScore);
+                const myKillRank = killSorted.findIndex(p => p.isMe) + 1;
+                const capSorted = [...processed].sort((a, b) => b.capScore - a.capScore);
+                const myCapRank = capSorted.findIndex(p => p.isMe) + 1;
+
+                totalRank += myRank;
+                killRankSum += myKillRank;
+                capRankSum += myCapRank;
+                history.push(myRank);
+                validMatches++;
+            }
+
+            const avgRank = validMatches > 0 ? totalRank / validMatches : 0;
+            const normalized = (avgRank - 1) / 4;
+            const clamped = Math.max(0, Math.min(1, normalized));
+            const sCurve = (1 - Math.cos(clamped * Math.PI)) / 2;
+            const maggotIndex = 1 + sCurve * 9;
+
+            return { maggotIndex, avgRank, avgKillRank: validMatches ? killRankSum/validMatches : 0, avgCapRank: validMatches ? capRankSum/validMatches : 0, validMatches, history };
+        }
+
+        function renderResultCard(cardId, stats, steamId, level) {
+            const contentDiv = document.getElementById(`content-${cardId}`);
+            let scoreClass = "score-mid", label = "混子";
+            const score = stats.maggotIndex;
+            if (score <= 3.0) { scoreClass = "score-god"; label = "神"; }
+            else if (score >= 7.0) { scoreClass = "score-maggot"; label = "蛆"; }
+
+            let historyHtml = '<div class="flex gap-0.5 mt-2">';
+            stats.history.reverse().forEach(rank => {
+                let color = "bg-slate-700";
+                if (rank === 1) color = "bg-green-500"; else if (rank === 5) color = "bg-red-500"; else if (rank === 2) color = "bg-blue-500";
+                historyHtml += `<div class="w-1.5 h-3 ${color} rounded-sm" title="Rank ${rank}"></div>`;
+            });
+            historyHtml += '</div>';
+
+            // 显示等级
+            const levelHtml = level !== undefined ? `<span class="text-xs text-yellow-500 font-mono border border-yellow-800 px-1 rounded ml-2">Lv.${level}</span>` : '';
+
+            contentDiv.innerHTML = `
+                <div class="flex flex-col items-center w-full">
+                    <div class="flex items-center justify-center w-full mb-1">
+                        <div class="text-4xl font-black ${scoreClass}">${score.toFixed(1)}</div>
+                        ${levelHtml}
+                    </div>
+                    <div class="text-xs font-bold uppercase tracking-wider mb-3 text-slate-400 border border-slate-700 px-2 rounded">${label}</div>
+                    
+                    <div class="grid grid-cols-3 gap-2 w-full text-center text-xs mb-2">
+                        <div class="bg-slate-800/50 p-1 rounded"><div class="text-slate-500 scale-75">综合</div><div class="font-bold text-white">#${stats.avgRank.toFixed(1)}</div></div>
+                        <div class="bg-slate-800/50 p-1 rounded"><div class="text-slate-500 scale-75">击杀</div><div class="font-bold text-red-300">#${stats.avgKillRank.toFixed(1)}</div></div>
+                        <div class="bg-slate-800/50 p-1 rounded"><div class="text-slate-500 scale-75">占点</div><div class="font-bold text-blue-300">#${stats.avgCapRank.toFixed(1)}</div></div>
+                    </div>
+                    
+                    <div class="text-[10px] text-slate-600">近 ${stats.validMatches} 场走势</div>
+                    ${historyHtml}
+                    <a href="index.html?steamId=${steamId}" target="_blank" class="mt-4 text-[10px] text-cyan-600 hover:text-cyan-400 underline">详情 ></a>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) { if (!text) return ""; return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    </script>
+</body>
+</html>

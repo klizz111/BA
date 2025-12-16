@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Arrow Maggot Index</title>
+    <title>Broken Arrow Maggot Index v2.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background-color: #0f172a;
-            color: #e2e8f0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
@@ -34,97 +30,42 @@
             transform: translateX(-50%);
             transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .match-row {
-            transition: all 0.2s;
-        }
-        .match-row:hover {
-            background-color: rgba(255,255,255,0.05);
-        }
+        .match-row { transition: all 0.2s; }
+        .match-row:hover { background-color: rgba(255,255,255,0.05); }
         .lang-btn {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
+            font-size: 0.75rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; transition: all 0.2s;
         }
-        .lang-btn.active {
-            background-color: #06b6d4;
-            border-color: #06b6d4;
-            color: white;
-        }
+        .lang-btn.active { background-color: #06b6d4; border-color: #06b6d4; color: white; }
         .teammate-badge {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            margin-bottom: 2px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 3px;
+            display: flex; justify-content: space-between; font-size: 0.75rem; padding: 2px 6px; margin-bottom: 2px; background: rgba(0,0,0,0.2); border-radius: 3px;
         }
-        .teammate-badge.is-me {
-            background: rgba(6, 182, 212, 0.3);
-            border: 1px solid rgba(6, 182, 212, 0.8);
-            color: #fff;
-            font-weight: bold;
-        }
-        .rank-pill {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 999px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-left: 4px;
-        }
+        .teammate-badge.is-me { background: rgba(6, 182, 212, 0.3); border: 1px solid rgba(6, 182, 212, 0.8); color: #fff; font-weight: bold; }
+        .rank-pill { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 0.7rem; font-weight: bold; margin-left: 4px; }
         .rank-pill-kill { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
         .rank-pill-cap { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
         
+        /* 队友名字可点击 - 样式改为放大镜/搜索图标 */
+        .teammate-link { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); transition: all 0.2s; position: relative; }
+        .teammate-link:hover { color: #22d3ee; border-bottom-color: #22d3ee; text-shadow: 0 0 8px rgba(34, 211, 238, 0.6); }
+        .teammate-link:hover::after { content: "🔍"; font-size: 0.6rem; position: absolute; top: -8px; right: -12px; }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(20px) rotate(1deg); }
-            to { opacity: 1; transform: translateX(0) rotate(1deg); }
-        }
-        .tag-animation {
-            animation: slideInRight 0.5s ease-out forwards;
-        }
-        
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(20px) rotate(1deg); } to { opacity: 1; transform: translateX(0) rotate(1deg); } }
+        .tag-animation { animation: slideInRight 0.5s ease-out forwards; }
         .cool-name {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 0 10px rgba(6, 182, 212, 0.1);
-            text-shadow: 0 0 5px rgba(34, 211, 238, 0.8);
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 0 10px rgba(6, 182, 212, 0.1); text-shadow: 0 0 5px rgba(34, 211, 238, 0.8);
         }
-
-        /* 历史记录标签 */
         .history-chip {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            background: rgba(51, 65, 85, 0.5);
-            border: 1px solid rgba(71, 85, 105, 0.5);
-            border-radius: 99px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 0.75rem; padding: 4px 10px; background: rgba(51, 65, 85, 0.5); border: 1px solid rgba(71, 85, 105, 0.5); border-radius: 99px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
         }
-        .history-chip:hover {
-            background: rgba(6, 182, 212, 0.2);
-            border-color: rgba(6, 182, 212, 0.5);
-            color: #22d3ee;
-        }
-        .history-remove {
-            opacity: 0.5;
-            font-weight: bold;
-        }
-        .history-remove:hover {
-            opacity: 1;
-            color: #fca5a5;
-        }
+        .history-chip:hover { background: rgba(6, 182, 212, 0.2); border-color: rgba(6, 182, 212, 0.5); color: #22d3ee; }
+        .history-remove { opacity: 0.5; font-weight: bold; }
+        .history-remove:hover { opacity: 1; color: #fca5a5; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center pt-10 px-4 pb-10">
@@ -145,13 +86,26 @@
             <h2 class="text-xl font-bold mb-2 text-white text-center" id="lbl_select_player_title">Identity Confirmation</h2>
             <p class="text-sm text-slate-400 mb-6 text-center" id="lbl_select_player_desc">Multiple players have identical match history. Please select yourself:</p>
             <div id="playerSelectList" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto"></div>
-            <button onclick="closePlayerModal()" class="mt-4 w-full py-2 text-xs text-slate-500 hover:text-white transition">Cancel</button>
+            <button onclick="closeModal('playerSelectModal')" class="mt-4 w-full py-2 text-xs text-slate-500 hover:text-white transition">Cancel</button>
+        </div>
+    </div>
+
+    <div id="searchSelectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-panel p-6 rounded-xl max-w-md w-full shadow-2xl">
+            <h2 class="text-xl font-bold mb-2 text-white text-center">Select Player / 选择玩家</h2>
+            <p class="text-sm text-slate-400 mb-4 text-center">Found multiple players. Please select one:</p>
+            <div id="searchSelectList" class="flex flex-col gap-2 max-h-[400px] overflow-y-auto"></div>
+            <button onclick="closeModal('searchSelectModal')" class="mt-4 w-full py-2 text-xs text-slate-500 hover:text-white transition">Cancel</button>
         </div>
     </div>
 
     <div class="w-full max-w-5xl flex justify-between items-center mb-4 px-2">
-        <div class="text-xs text-slate-500">v1.9 History & Filter</div>
-        <div class="flex gap-2">
+        <div class="text-xs text-slate-500">v2.3 Search & Link</div>
+        <div class="flex gap-2 items-center">
+            <button onclick="window.location.href='batch.html'" class="px-3 py-1 text-xs rounded bg-gradient-to-r from-cyan-900 to-blue-900 hover:from-cyan-800 hover:to-blue-800 border border-cyan-700 text-cyan-100 transition flex items-center gap-1 mr-2 shadow-lg">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                批量查询 (Batch)
+            </button>
             <button onclick="setLanguage('en')" id="btn_en" class="lang-btn">EN</button>
             <button onclick="setLanguage('zh')" id="btn_zh" class="lang-btn">中文</button>
             <button onclick="setLanguage('ru')" id="btn_ru" class="lang-btn">RU</button>
@@ -165,9 +119,7 @@
                 <span class="text-sm font-normal text-slate-500 ml-3 italic">By Zola</span>
             </h1>
             <p class="text-slate-400 text-sm" id="lbl_subtitle">Broken Arrow Maggot Index</p>
-            
-            <a href="https://batrace.aoeiaol.top" target="_blank" 
-               class="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-600 text-xs text-slate-300 hover:bg-slate-700 hover:text-cyan-400 transition">
+            <a href="https://batrace.aoeiaol.top" target="_blank" class="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-600 text-xs text-slate-300 hover:bg-slate-700 hover:text-cyan-400 transition">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 <span id="lbl_source">数据来自 batrace.aoeiaol.top</span>
             </a>
@@ -175,27 +127,18 @@
 
         <div class="flex flex-col items-center mb-8">
             <div class="flex flex-col md:flex-row gap-4 justify-center items-center w-full">
-                <div class="w-full md:w-96">
-                    <input type="text" id="steamInput" 
-                        placeholder="Steam64 ID..." 
-                        class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-3 placeholder-slate-500 shadow-inner text-center">
+                <div class="w-full md:w-96 relative">
+                    <input type="text" id="steamInput" placeholder="Steam64 ID or Name..." class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-3 placeholder-slate-500 shadow-inner text-center">
                 </div>
-                
-                <button onclick="runAnalysis()" id="btn_check"
-                    class="text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-800 font-medium rounded-lg text-sm px-8 py-3 text-center shadow-lg transform active:scale-95 transition-transform whitespace-nowrap">
-                    开始检测
-                </button>
+                <button onclick="handleCheckBtn()" id="btn_check" class="text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-800 font-medium rounded-lg text-sm px-8 py-3 text-center shadow-lg transform active:scale-95 transition-transform whitespace-nowrap">开始检测</button>
             </div>
-            
-            <div id="historyContainer" class="flex flex-wrap justify-center gap-2 mt-4 max-w-2xl">
-                </div>
+            <div id="historyContainer" class="flex flex-wrap justify-center gap-2 mt-4 max-w-2xl"></div>
         </div>
 
         <div id="loading" class="hidden text-center py-8">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
             <p class="mt-2 text-slate-400" id="lbl_analyzing">正在分析战局数据...</p>
         </div>
-
         <div id="errorMsg" class="hidden bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded relative mb-6 text-sm" role="alert">
             <span class="block" id="errorText"></span>
         </div>
@@ -203,54 +146,21 @@
         <div id="resultPanel" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-slate-800/80 rounded-xl p-6 border border-slate-700 col-span-1 md:col-span-4 flex flex-col items-center relative overflow-hidden">
-                    
-                    <div id="tagsContainer" class="absolute top-4 right-4 flex flex-col gap-2 items-end">
-                        </div>
-
+                    <div id="tagsContainer" class="absolute top-4 right-4 flex flex-col gap-2 items-end"></div>
                     <h2 class="text-xl font-bold text-slate-300 mb-2" id="lbl_maggot_index">蛆指数 (Maggot Index)</h2>
-                    <div class="text-6xl font-black mb-1" id="maggotScoreDisplay" style="text-shadow: 0 0 20px rgba(0,0,0,0.5);">
-                        -
-                    </div>
-                    
-                    <div class="text-[10px] text-slate-600 font-mono mb-2" id="calcTime">
-                        Calculated at: --:--:--
-                    </div>
-
-                    <div id="currentPlayerName" class="cool-name text-2xl text-cyan-300 font-bold mb-4 px-6 py-2 rounded-lg tracking-wide">
-                        </div>
-
+                    <div class="text-6xl font-black mb-1" id="maggotScoreDisplay" style="text-shadow: 0 0 20px rgba(0,0,0,0.5);">-</div>
+                    <div class="text-[10px] text-slate-600 font-mono mb-2" id="calcTime">Calculated at: --:--:--</div>
+                    <div id="currentPlayerName" class="cool-name text-2xl text-cyan-300 font-bold mb-4 px-6 py-2 rounded-lg tracking-wide"></div>
                     <div class="text-lg font-bold mb-4" id="maggotLabel">Unknown</div>
-                    
                     <div class="w-full max-w-lg">
-                        <div class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span id="lbl_god">神 (1.0)</span>
-                            <span id="lbl_maggot">纯蛆 (10.0)</span>
-                        </div>
-                        <div class="maggot-meter-bg">
-                            <div id="meterIndicator" class="maggot-indicator" style="left: 50%;"></div>
-                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1"><span id="lbl_god">神 (1.0)</span><span id="lbl_maggot">纯蛆 (10.0)</span></div>
+                        <div class="maggot-meter-bg"><div id="meterIndicator" class="maggot-indicator" style="left: 50%;"></div></div>
                     </div>
                 </div>
-
-                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1">
-                    <div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_total">平均综合排名</div>
-                    <div class="text-2xl font-bold text-yellow-400" id="avgRank">0.0</div>
-                </div>
-
-                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1">
-                    <div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_kill">平均击杀排名</div>
-                    <div class="text-2xl font-bold text-red-400" id="avgKillRank">0.0</div>
-                </div>
-
-                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1">
-                    <div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_cap">平均占点排名</div>
-                    <div class="text-2xl font-bold text-blue-400" id="avgCapRank">0.0</div>
-                </div>
-
-                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1">
-                    <div class="text-xs text-slate-400 mb-1" id="lbl_matches">统计局数</div>
-                    <div class="text-2xl font-bold text-white" id="matchCount">0</div>
-                </div>
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1"><div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_total">平均综合排名</div><div class="text-2xl font-bold text-yellow-400" id="avgRank">0.0</div></div>
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1"><div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_kill">平均击杀排名</div><div class="text-2xl font-bold text-red-400" id="avgKillRank">0.0</div></div>
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1"><div class="text-xs text-slate-400 mb-1" id="lbl_avg_rank_cap">平均占点排名</div><div class="text-2xl font-bold text-blue-400" id="avgCapRank">0.0</div></div>
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700 text-center col-span-1 md:col-span-1"><div class="text-xs text-slate-400 mb-1" id="lbl_matches">统计局数</div><div class="text-2xl font-bold text-white" id="matchCount">0</div></div>
             </div>
 
             <h3 class="text-xl font-bold mb-4 pl-2 border-l-4 border-cyan-500" id="lbl_history">最近战绩明细</h3>
@@ -263,621 +173,198 @@
                             <th scope="col" class="px-6 py-3 w-32 text-center" id="th_status">状态</th>
                         </tr>
                     </thead>
-                    <tbody id="matchTableBody">
-                        </tbody>
+                    <tbody id="matchTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // ================= 工具函数 =================
-        function escapeHtml(text) {
-            if (!text) return text;
-            const str = String(text);
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        // ================= 配置与语言包 =================
+        // ================= JS Logic =================
+        function escapeHtml(text) { if (!text && text !== 0) return ""; return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+        
         const translations = {
-            zh: {
-                title: "断箭蛆指数",
-                subtitle: "Broken Arrow Maggot Index",
-                source: "数据来自 batrace.aoeiaol.top",
-                check: "开始检测",
-                analyzing: "正在分析战局数据...",
-                maggot_index: "蛆指数",
-                god: "神 (1.0)",
-                maggot: "纯蛆 (10.0)",
-                lbl_avg_rank_total: "平均综合排名",
-                lbl_avg_rank_kill: "平均击杀排名",
-                lbl_avg_rank_cap: "平均占点排名",
-                matches: "统计局数 (12场)",
-                history: "最近战绩明细",
-                th_score: "我的贡献",
-                th_team_details: "队伍详情 (ID: 分数)",
-                th_status: "评价",
-                err_input: "请输入有效的 Steam64 ID",
-                err_network: "网络请求失败，请检查网络或重试",
-                err_data: "未能解析到有效数据",
-                err_no_matches: "未找到对局数据",
-                err_insufficient_prefix: "有效对局不足 12 局",
-                err_insufficient_suffix: "。系统已自动过滤掉人数不足 5 人或全员 0 分的异常对局。",
-                label_carry: "CARRY",
-                label_normal: "普通",
-                label_pot: "背锅",
-                tag_killer: "⚔️ 击杀达人",
-                tag_capper: "🚩 占点达人",
-                tag_trend_up: "📈 最近状态变好",
-                tag_trend_down: "📉 最近状态不佳",
-                tag_trend_flat: "➡️ 最近状态平稳",
-                maggot_levels: ["👑 绝世大腿 / 疑似开挂", "🦁 团队中坚", "😐 也就是个混子", "🐛 只有一点蛆", "💩 纯种蛆王"],
-                sel_title: "身份确认",
-                sel_desc: "发现多名玩家场次相同（疑似组队），请确认哪一位是您：",
-                me: "这就是我"
-            },
-            en: {
-                title: "Maggot Index",
-                subtitle: "Broken Arrow Player Analysis",
-                source: "Data: batrace.aoeiaol.top",
-                check: "Check Now",
-                analyzing: "Analyzing match data...",
-                maggot_index: "Maggot Index",
-                god: "GOD (1.0)",
-                maggot: "MAGGOT (10.0)",
-                lbl_avg_rank_total: "Avg Team Rank",
-                lbl_avg_rank_kill: "Avg Kill Rank",
-                lbl_avg_rank_cap: "Avg Cap Rank",
-                matches: "Matches (12 Games)",
-                history: "Recent Match Details",
-                th_score: "My Score",
-                th_team_details: "Team Details (Sorted by Score)",
-                th_status: "Rating",
-                err_input: "Please enter a valid Steam64 ID",
-                err_network: "Network request failed",
-                err_data: "Failed to parse data",
-                err_no_matches: "No matches found",
-                err_insufficient_prefix: "Insufficient valid matches",
-                err_insufficient_suffix: ". Abnormal matches (<5 players or 0-score bug) were filtered out.",
-                label_carry: "CARRY",
-                label_normal: "NORMAL",
-                label_pot: "SCAPEGOAT",
-                tag_killer: "⚔️ TERMINATOR",
-                tag_capper: "🚩 OBJ MASTER",
-                tag_trend_up: "📈 IMPROVING",
-                tag_trend_down: "📉 DECLINING",
-                tag_trend_flat: "➡️ STABLE",
-                maggot_levels: ["👑 GODLIKE", "🦁 TEAM CARRY", "😐 AVERAGE JOE", "🐛 BIT OF A MAGGOT", "💩 PURE MAGGOT"],
-                sel_title: "Identify Yourself",
-                sel_desc: "Multiple players have identical match history. Please select yourself:",
-                me: "This is me"
-            },
-            ru: {
-                title: "Индекс Личинки",
-                subtitle: "Анализ игрока Broken Arrow",
-                source: "Данные: batrace.aoeiaol.top",
-                check: "Проверить",
-                analyzing: "Анализ данных...",
-                maggot_index: "Индекс Личинки",
-                god: "БОГ (1.0)",
-                maggot: "ЛИЧИНКА (10.0)",
-                lbl_avg_rank_total: "Ср. ранг",
-                lbl_avg_rank_kill: "Ранг убийств",
-                lbl_avg_rank_cap: "Ранг точек",
-                matches: "Матчей (12 игр)",
-                history: "История матчей",
-                th_score: "Мой счет",
-                th_team_details: "Команда (по счету)",
-                th_status: "Рейтинг",
-                err_input: "Введите корректный Steam64 ID",
-                err_network: "Ошибка сети",
-                err_data: "Ошибка данных",
-                err_no_matches: "Матчи не найдены",
-                err_insufficient_prefix: "Недостаточно матчей",
-                err_insufficient_suffix: ". Исключены матчи с <5 игроками или багом 0 очков.",
-                label_carry: "ТАЩЕР",
-                label_normal: "НОРМ",
-                label_pot: "ВАГОН",
-                tag_killer: "⚔️ УБИЙЦА",
-                tag_capper: "🚩 ЗАХВАТЧИК",
-                tag_trend_up: "📈 УЛУЧШЕНИЕ",
-                tag_trend_down: "📉 УХУДШЕНИЕ",
-                tag_trend_flat: "➡️ СТАБИЛЬНО",
-                maggot_levels: ["👑 БОГ", "🦁 ТАЩЕР", "😐 СРЕДНЯЧОК", "🐛 НЕМНОГО ЛИЧИНКА", "💩 100% ЛИЧИНКА"],
-                sel_title: "Подтверждение",
-                sel_desc: "Несколько игроков имеют одинаковую историю. Выберите себя:",
-                me: "Это я"
-            }
+            zh: { title: "断箭蛆指数", subtitle: "Broken Arrow Maggot Index", source: "数据来自 batrace.aoeiaol.top", check: "开始检测", analyzing: "正在分析战局数据...", searching: "正在搜索玩家...", maggot_index: "蛆指数", god: "神 (1.0)", maggot: "纯蛆 (10.0)", lbl_avg_rank_total: "平均综合排名", lbl_avg_rank_kill: "平均击杀排名", lbl_avg_rank_cap: "平均占点排名", matches: "统计局数 (12场)", history: "最近战绩明细", th_score: "我的贡献", th_team_details: "队伍详情 (点击名字搜此人)", th_status: "评价", err_input: "请输入 Steam64 ID 或玩家名称", err_network: "网络请求失败，请检查网络", err_data: "未能解析到有效数据", err_no_matches: "未找到对局数据", err_player_not_found: "未找到该玩家", err_insufficient_prefix: "有效对局不足 12 局", err_insufficient_suffix: "。系统已自动过滤掉人数不足 5 人或全员 0 分的异常对局。", label_carry: "CARRY", label_normal: "普通", label_pot: "背锅", tag_killer: "⚔️ 击杀达人", tag_capper: "🚩 占点达人", tag_trend_up: "📈 最近状态变好", tag_trend_down: "📉 最近状态不佳", tag_trend_flat: "➡️ 最近状态平稳", maggot_levels: ["👑 绝世大腿 / 疑似开挂", "🦁 团队中坚", "😐 也就是个混子", "🐛 只有一点蛆", "💩 纯种蛆王"], sel_title: "身份确认", sel_desc: "发现多名玩家场次相同（疑似组队），请确认哪一位是您：", me: "这就是我" },
+            en: { title: "Maggot Index", subtitle: "Broken Arrow Player Analysis", source: "Data: batrace.aoeiaol.top", check: "Check Now", analyzing: "Analyzing match data...", searching: "Searching player...", maggot_index: "Maggot Index", god: "GOD (1.0)", maggot: "MAGGOT (10.0)", lbl_avg_rank_total: "Avg Team Rank", lbl_avg_rank_kill: "Avg Kill Rank", lbl_avg_rank_cap: "Avg Cap Rank", matches: "Matches (12 Games)", history: "Recent Match Details", th_score: "My Score", th_team_details: "Team Details (Click Name to Search)", th_status: "Rating", err_input: "Please enter Steam64 ID or Name", err_network: "Network request failed", err_data: "Failed to parse data", err_no_matches: "No matches found", err_player_not_found: "Player not found", err_insufficient_prefix: "Insufficient valid matches", err_insufficient_suffix: ". Abnormal matches (<5 players or 0-score bug) were filtered out.", label_carry: "CARRY", label_normal: "NORMAL", label_pot: "SCAPEGOAT", tag_killer: "⚔️ TERMINATOR", tag_capper: "🚩 OBJ MASTER", tag_trend_up: "📈 IMPROVING", tag_trend_down: "📉 DECLINING", tag_trend_flat: "➡️ STABLE", maggot_levels: ["👑 GODLIKE", "🦁 TEAM CARRY", "😐 AVERAGE JOE", "🐛 BIT OF A MAGGOT", "💩 PURE MAGGOT"], sel_title: "Identify Yourself", sel_desc: "Multiple players have identical match history. Please select yourself:", me: "This is me" },
+            ru: { title: "Индекс Личинки", subtitle: "Анализ игрока Broken Arrow", source: "Данные: batrace.aoeiaol.top", check: "Проверить", analyzing: "Анализ данных...", searching: "Поиск игрока...", maggot_index: "Индекс Личинки", god: "БОГ (1.0)", maggot: "ЛИЧИНКА (10.0)", lbl_avg_rank_total: "Ср. ранг", lbl_avg_rank_kill: "Ранг убийств", lbl_avg_rank_cap: "Ранг точек", matches: "Матчей (12 игр)", history: "История матчей", th_score: "Мой счет", th_team_details: "Команда (Клик для проверки)", th_status: "Рейтинг", err_input: "Введите Steam64 ID или имя", err_network: "Ошибка сети", err_data: "Ошибка данных", err_no_matches: "Матчи не найдены", err_player_not_found: "Игрок не найден", err_insufficient_prefix: "Недостаточно матчей", err_insufficient_suffix: ". Исключены матчи с <5 игроками или багом 0 очков.", label_carry: "ТАЩЕР", label_normal: "НОРМ", label_pot: "ВАГОН", tag_killer: "⚔️ УБИЙЦА", tag_capper: "🚩 ЗАХВАТЧИК", tag_trend_up: "📈 УЛУЧШЕНИЕ", tag_trend_down: "📉 УХУДШЕНИЕ", tag_trend_flat: "➡️ СТАБИЛЬНО", maggot_levels: ["👑 БОГ", "🦁 ТАЩЕР", "😐 СРЕДНЯЧОК", "🐛 НЕМНОГО ЛИЧИНКА", "💩 100% ЛИЧИНКА"], sel_title: "Подтверждение", sel_desc: "Несколько игроков имеют одинаковую историю. Выберите себя:", me: "Это я" }
         };
 
         let currentLang = 'zh';
         let sortedAllMatches = []; 
         const HISTORY_KEY = 'broken_arrow_history';
 
-        // ================= Cookie & LocalStorage =================
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = name + "=" + value + ";expires=" + date.toUTCString() + ";path=/";
-        }
+        function setCookie(name, value, days) { const date = new Date(); date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); document.cookie = name + "=" + value + ";expires=" + date.toUTCString() + ";path=/"; }
+        function getCookie(name) { const nameEQ = name + "="; const ca = document.cookie.split(';'); for(let i=0;i < ca.length;i++) { let c = ca[i]; while (c.charAt(0)==' ') c = c.substring(1,c.length); if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length); } return null; }
 
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for(let i=0;i < ca.length;i++) {
-                let c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
-        }
+        function addToHistory(id, name) { let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); history = history.filter(h => h.id !== id); history.unshift({ id: id, name: name }); if (history.length > 10) history.pop(); localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); renderHistory(); }
+        function renderHistory() { const container = document.getElementById('historyContainer'); const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); container.innerHTML = ''; history.forEach(h => { const chip = document.createElement('div'); chip.className = 'history-chip'; const safeName = escapeHtml(h.name); chip.innerHTML = `<span onclick="useHistory('${h.id}')" class="truncate max-w-[100px]">${safeName}</span><span class="history-remove" onclick="removeHistory('${h.id}')">×</span>`; container.appendChild(chip); }); }
+        function useHistory(id) { document.getElementById('steamInput').value = id; runAnalysis(); }
+        function removeHistory(id) { let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); history = history.filter(h => h.id !== id); localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); renderHistory(); }
 
-        function addToHistory(id, name) {
-            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            // 移除已存在的
-            history = history.filter(h => h.id !== id);
-            // 添加到最前
-            history.unshift({ id: id, name: name });
-            // 限制数量 (例如10个)
-            if (history.length > 10) history.pop();
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const container = document.getElementById('historyContainer');
-            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            container.innerHTML = '';
-            
-            history.forEach(h => {
-                const chip = document.createElement('div');
-                chip.className = 'history-chip';
-                const safeName = escapeHtml(h.name);
-                chip.innerHTML = `
-                    <span onclick="useHistory('${h.id}')" class="truncate max-w-[100px]">${safeName}</span>
-                    <span class="history-remove" onclick="removeHistory('${h.id}')">×</span>
-                `;
-                container.appendChild(chip);
-            });
-        }
-
-        function useHistory(id) {
-            document.getElementById('steamInput').value = id;
-            runAnalysis();
-        }
-
-        function removeHistory(id) {
-            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            history = history.filter(h => h.id !== id);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-
-        // ================= 初始化 =================
         window.onload = function() {
             const savedLang = getCookie('lang');
-            if (savedLang) {
-                setLanguage(savedLang);
-            } else {
-                document.getElementById('langModal').classList.remove('hidden');
-            }
-            const savedSteam = getCookie('steamId');
-            if (savedSteam) {
-                document.getElementById('steamInput').value = savedSteam;
-            }
-            renderHistory(); // 加载历史
+            if (savedLang) setLanguage(savedLang); else document.getElementById('langModal').classList.remove('hidden');
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramId = urlParams.get('steamId');
+            if (paramId) { document.getElementById('steamInput').value = paramId; runAnalysis(); } else { const savedSteam = getCookie('steamId'); if (savedSteam) document.getElementById('steamInput').value = savedSteam; }
+            renderHistory(); 
         };
 
-        function selectLanguage(lang) {
-            setLanguage(lang);
-            document.getElementById('langModal').classList.add('hidden');
-        }
-
+        function selectLanguage(lang) { setLanguage(lang); document.getElementById('langModal').classList.add('hidden'); }
         function setLanguage(lang) {
-            currentLang = lang;
-            setCookie('lang', lang, 365);
-            
-            ['en', 'zh', 'ru'].forEach(l => {
-                const btn = document.getElementById(`btn_${l}`);
-                if (l === lang) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-
+            currentLang = lang; setCookie('lang', lang, 365);
+            ['en', 'zh', 'ru'].forEach(l => { const btn = document.getElementById(`btn_${l}`); if (l === lang) btn.classList.add('active'); else btn.classList.remove('active'); });
             const t = translations[lang];
             const setText = (id, txt) => { const el = document.getElementById(id); if(el) el.innerText = txt; };
-
-            setText('lbl_title', t.title);
-            setText('lbl_subtitle', t.subtitle);
-            setText('lbl_source', t.source);
-            setText('btn_check', t.check);
-            setText('lbl_analyzing', t.analyzing);
-            setText('lbl_maggot_index', t.maggot_index);
-            setText('lbl_god', t.god);
-            setText('lbl_maggot', t.maggot);
-            setText('lbl_avg_rank_total', t.lbl_avg_rank_total);
-            setText('lbl_avg_rank_kill', t.lbl_avg_rank_kill);
-            setText('lbl_avg_rank_cap', t.lbl_avg_rank_cap);
-            setText('lbl_matches', t.matches);
-            setText('lbl_history', t.history);
-            setText('th_score', t.th_score);
-            setText('th_team_details', t.th_team_details);
-            setText('th_status', t.th_status);
-            setText('lbl_select_player_title', t.sel_title);
-            setText('lbl_select_player_desc', t.sel_desc);
+            setText('lbl_title', t.title); setText('lbl_subtitle', t.subtitle); setText('lbl_source', t.source); setText('btn_check', t.check); setText('lbl_analyzing', t.analyzing); setText('lbl_maggot_index', t.maggot_index); setText('lbl_god', t.god); setText('lbl_maggot', t.maggot); setText('lbl_avg_rank_total', t.lbl_avg_rank_total); setText('lbl_avg_rank_kill', t.lbl_avg_rank_kill); setText('lbl_avg_rank_cap', t.lbl_avg_rank_cap); setText('lbl_matches', t.matches); setText('lbl_history', t.history); setText('th_score', t.th_score); setText('th_team_details', t.th_team_details); setText('th_status', t.th_status); setText('lbl_select_player_title', t.sel_title); setText('lbl_select_player_desc', t.sel_desc);
+            document.getElementById('steamInput').placeholder = t.err_input;
         }
 
-        // ================= 逻辑 =================
-        function parseTruncatedJSON(content) {
-            const objects = [];
-            let depth = 0;
-            let objStart = -1;
-            let idx = content.indexOf('[');
-            if (idx === -1) {
-                try { return [JSON.parse(content)]; } catch(e) { return []; }
-            }
-            idx += 1;
-            while (idx < content.length) {
-                const char = content[idx];
-                if (char === '{') {
-                    if (depth === 0) objStart = idx;
-                    depth++;
-                } else if (char === '}') {
-                    depth--;
-                    if (depth === 0) {
-                        const objStr = content.substring(objStart, idx + 1);
-                        try { objects.push(JSON.parse(objStr)); } catch (e) {}
-                    }
-                }
-                idx++;
-            }
-            return objects;
+        function parseTruncatedJSON(content) { const objects = []; let depth = 0; let objStart = -1; let idx = content.indexOf('['); if (idx === -1) { try { return [JSON.parse(content)]; } catch(e) { return []; } } idx += 1; while (idx < content.length) { const char = content[idx]; if (char === '{') { if (depth === 0) objStart = idx; depth++; } else if (char === '}') { depth--; if (depth === 0) { const objStr = content.substring(objStart, idx + 1); try { objects.push(JSON.parse(objStr)); } catch (e) {} } } idx++; } return objects; }
+
+        async function handleCheckBtn() {
+            const inputVal = document.getElementById('steamInput').value.trim();
+            const t = translations[currentLang];
+            if (!inputVal) { showError(t.err_input); return; }
+            const isId = /^\d{16,18}$/.test(inputVal);
+            if (isId) runAnalysis(); else searchPlayerByName(inputVal);
+        }
+
+        async function searchPlayerByName(name) {
+            const t = translations[currentLang];
+            document.getElementById('loading').classList.remove('hidden'); document.getElementById('lbl_analyzing').innerText = t.searching; document.getElementById('resultPanel').classList.add('hidden'); document.getElementById('errorMsg').classList.add('hidden');
+            try {
+                // Limit changed to 8
+                const url = `https://batrace.aoeiaol.top/api/v1/search/players?q=${encodeURIComponent(name)}&limit=8`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(t.err_network);
+                const data = await response.json();
+                const results = data.results || [];
+                if (results.length === 0) { showError(t.err_player_not_found); document.getElementById('loading').classList.add('hidden'); return; }
+                const exactMatch = results.filter(p => p.name.toLowerCase() === name.toLowerCase());
+                if (exactMatch.length === 1 && results.length === 1) { document.getElementById('steamInput').value = exactMatch[0].steam_id; runAnalysis(); } else { showSearchSelectModal(results); document.getElementById('loading').classList.add('hidden'); }
+            } catch(e) { showError(e.message); document.getElementById('loading').classList.add('hidden'); }
+        }
+
+        function showSearchSelectModal(players) {
+            const modal = document.getElementById('searchSelectModal'); const list = document.getElementById('searchSelectList'); list.innerHTML = '';
+            players.forEach(p => {
+                const btn = document.createElement('button'); btn.className = "w-full text-left p-4 rounded bg-slate-700 hover:bg-cyan-700 hover:shadow-lg transition border border-slate-600 flex justify-between items-center group";
+                const level = p.level || 0; const safeName = escapeHtml(p.name);
+                btn.innerHTML = `<div class="overflow-hidden"><div class="font-bold text-white group-hover:text-white truncate pr-2 text-lg">${safeName}</div><div class="text-xs text-slate-400">ID: ${p.steam_id}</div></div><div class="flex flex-col items-end gap-1 flex-shrink-0"><div class="text-xs px-2 py-0.5 bg-yellow-900/50 text-yellow-200 rounded border border-yellow-700">Lv.${level}</div></div>`;
+                btn.onclick = () => { modal.classList.add('hidden'); document.getElementById('steamInput').value = p.steam_id; runAnalysis(); }; list.appendChild(btn);
+            });
+            modal.classList.remove('hidden');
+        }
+
+        // 修改后的队友点击逻辑：直接填入名字并搜索，不再尝试跳转ID
+        function inspectTeammateByName(name) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('steamInput').value = name;
+            handleCheckBtn(); // 触发搜索流程
         }
 
         async function runAnalysis() {
-            const steamId = document.getElementById('steamInput').value.trim();
-            const t = translations[currentLang];
-            
-            if (!steamId) {
-                showError(t.err_input);
-                return;
-            }
-            setCookie('steamId', steamId, 30);
-
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('resultPanel').classList.add('hidden');
-            document.getElementById('errorMsg').classList.add('hidden');
-            document.getElementById('playerSelectModal').classList.add('hidden');
-
+            const steamId = document.getElementById('steamInput').value.trim(); const t = translations[currentLang];
+            document.getElementById('lbl_analyzing').innerText = t.analyzing;
+            if (!steamId) { showError(t.err_input); return; } setCookie('steamId', steamId, 30);
+            document.getElementById('loading').classList.remove('hidden'); document.getElementById('resultPanel').classList.add('hidden'); document.getElementById('errorMsg').classList.add('hidden'); closeModal('playerSelectModal'); closeModal('searchSelectModal');
             try {
                 const url = `https://batrace.aoeiaol.top/api/v1/matches_steam64?steam64=${steamId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(t.err_network + ` (${response.status})`);
                 const rawText = await response.text();
                 const allObjects = parseTruncatedJSON(rawText);
-                
                 if (allObjects.length === 0) throw new Error(t.err_data);
-
                 prepareData(allObjects);
-
-            } catch (err) {
-                showError(err.message);
-                console.error(err);
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
-            }
+            } catch (err) { showError(err.message); console.error(err); } finally { document.getElementById('loading').classList.add('hidden'); }
         }
 
         function prepareData(allObjects) {
-            const t = translations[currentLang];
-            const matches = allObjects.filter(obj => obj.type === 'match');
-
-            if (matches.length === 0) {
-                showError(t.err_no_matches);
-                return;
-            }
-
-            // 按 EndTime 倒序
-            matches.sort((a, b) => {
-                const timeA = (a.data && a.data.EndTime) ? a.data.EndTime : 0;
-                const timeB = (b.data && b.data.EndTime) ? b.data.EndTime : 0;
-                return timeB - timeA;
-            });
-            
+            const t = translations[currentLang]; const matches = allObjects.filter(obj => obj.type === 'match');
+            if (matches.length === 0) { showError(t.err_no_matches); return; }
+            matches.sort((a, b) => { const timeA = (a.data && a.data.EndTime) ? a.data.EndTime : 0; const timeB = (b.data && b.data.EndTime) ? b.data.EndTime : 0; return timeB - timeA; });
             sortedAllMatches = matches;
-
-            // 智能识别玩家 ID
-            const sampleMatches = matches.slice(0, 20);
-            const idCounts = {};
-            const idNames = {}; 
-
-            sampleMatches.forEach(m => {
-                if(m.data && m.data.Data) {
-                    Object.values(m.data.Data).forEach(p => {
-                        idCounts[p.Id] = (idCounts[p.Id] || 0) + 1;
-                        if (p.Name) idNames[p.Id] = p.Name; 
-                    });
-                }
-            });
-
-            let maxCount = 0;
-            for (const count of Object.values(idCounts)) {
-                if (count > maxCount) maxCount = count;
-            }
-
-            const candidates = [];
-            for (const [id, count] of Object.entries(idCounts)) {
-                if (count === maxCount) {
-                    candidates.push({
-                        id: id,
-                        name: idNames[id] || `Unknown (${id})`
-                    });
-                }
-            }
-
-            if (candidates.length === 0) {
-                showError(t.err_data);
-            } else if (candidates.length === 1) {
-                analyzeData(candidates[0].id);
-            } else {
-                showPlayerSelectModal(candidates);
-            }
+            const sampleMatches = matches.slice(0, 20); const idCounts = {}; const idNames = {}; 
+            sampleMatches.forEach(m => { if(m.data && m.data.Data) { Object.values(m.data.Data).forEach(p => { idCounts[p.Id] = (idCounts[p.Id] || 0) + 1; if (p.Name) idNames[p.Id] = p.Name; }); } });
+            let maxCount = 0; for (const count of Object.values(idCounts)) { if (count > maxCount) maxCount = count; }
+            const candidates = []; for (const [id, count] of Object.entries(idCounts)) { if (count === maxCount) { candidates.push({ id: id, name: idNames[id] || `Unknown (${id})` }); } }
+            if (candidates.length === 0) { showError(t.err_data); } else if (candidates.length === 1) { analyzeData(candidates[0].id); } else { showPlayerSelectModal(candidates); }
         }
 
         function showPlayerSelectModal(candidates) {
-            const modal = document.getElementById('playerSelectModal');
-            const list = document.getElementById('playerSelectList');
-            const t = translations[currentLang];
-            
-            list.innerHTML = '';
-            
-            candidates.forEach(c => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 rounded bg-slate-700 hover:bg-cyan-700 hover:shadow-lg transition border border-slate-600 flex justify-between items-center group";
-                const safeName = escapeHtml(c.name);
-                btn.innerHTML = `
-                    <div class="overflow-hidden">
-                        <div class="font-bold text-white group-hover:text-white truncate pr-2">${safeName}</div>
-                        <div class="text-xs text-slate-400">ID: ${c.id}</div>
-                    </div>
-                    <div class="text-xs px-3 py-1 bg-slate-800 rounded text-slate-300 group-hover:bg-cyan-600 group-hover:text-white transition flex-shrink-0">
-                        ${t.me}
-                    </div>
-                `;
-                btn.onclick = () => {
-                    modal.classList.add('hidden');
-                    analyzeData(c.id);
-                };
-                list.appendChild(btn);
-            });
-            
-            modal.classList.remove('hidden');
+            const modal = document.getElementById('playerSelectModal'); const list = document.getElementById('playerSelectList'); const t = translations[currentLang]; list.innerHTML = '';
+            candidates.forEach(c => { const btn = document.createElement('button'); btn.className = "w-full text-left p-4 rounded bg-slate-700 hover:bg-cyan-700 hover:shadow-lg transition border border-slate-600 flex justify-between items-center group"; const safeName = escapeHtml(c.name); btn.innerHTML = `<div class="overflow-hidden"><div class="font-bold text-white group-hover:text-white truncate pr-2">${safeName}</div><div class="text-xs text-slate-400">ID: ${c.id}</div></div><div class="text-xs px-3 py-1 bg-slate-800 rounded text-slate-300 group-hover:bg-cyan-600 group-hover:text-white transition flex-shrink-0">${t.me}</div>`; btn.onclick = () => { modal.classList.add('hidden'); analyzeData(c.id); }; list.appendChild(btn); }); modal.classList.remove('hidden');
         }
-
-        function closePlayerModal() {
-            document.getElementById('playerSelectModal').classList.add('hidden');
-        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         function analyzeData(mainPlayerId) {
-            const t = translations[currentLang];
-            const validStats = [];
-            let mainPlayerName = "";
-            let idx = 0;
-            
-            // 循环过滤，直到找到12个有效对局
+            const t = translations[currentLang]; const validStats = []; let mainPlayerName = ""; let idx = 0;
             while (validStats.length < 12 && idx < sortedAllMatches.length) {
-                const match = sortedAllMatches[idx];
-                idx++;
-
+                const match = sortedAllMatches[idx]; idx++;
                 if (!match.data || !match.data.Data || !match.data.Data[mainPlayerId]) continue;
-
-                const data = match.data.Data;
-                const me = data[mainPlayerId];
-                const myTeam = me.TeamId;
-                
+                const data = match.data.Data; const me = data[mainPlayerId]; const myTeam = me.TeamId;
                 if (me.Name) mainPlayerName = me.Name;
-
                 let teammates = Object.values(data).filter(p => p.TeamId == myTeam);
-                
-                // 1. 过滤人数不足5人
                 if (teammates.length < 5) continue;
-
                 const processed = teammates.map(p => {
-                    const d = p.DestructionScore || 0;
-                    const l = p.LossesScore || 0;
-                    const obj = p.ObjectivesCaptured || 0;
-                    const killScore = (d - l) / 1000;
-                    
-                    return {
-                        id: p.Id,
-                        name: p.Name || p.Id,
-                        killScore: killScore,
-                        capScore: obj,
-                        totalScore: killScore + obj,
-                        isMe: (p.Id == mainPlayerId)
-                    };
+                    const d = p.DestructionScore || 0; const l = p.LossesScore || 0; const obj = p.ObjectivesCaptured || 0; const killScore = (d - l) / 1000;
+                    return { id: p.Id, name: p.Name || p.Id, killScore: killScore, capScore: obj, totalScore: killScore + obj, isMe: (p.Id == mainPlayerId) };
                 });
-                
-                // 2. 过滤全员 0 分 (僵尸局/异常局)
-                const allZero = processed.every(p => p.totalScore === 0);
-                if (allZero) continue;
-
+                if (processed.every(p => p.totalScore === 0)) continue;
                 processed.sort((a, b) => b.totalScore - a.totalScore);
-                const myRank = processed.findIndex(p => p.isMe) + 1;
-                const myEntry = processed.find(p => p.isMe);
-
-                const killSorted = [...processed].sort((a, b) => b.killScore - a.killScore);
-                const myKillRank = killSorted.findIndex(p => p.isMe) + 1;
-
-                const capSorted = [...processed].sort((a, b) => b.capScore - a.capScore);
-                const myCapRank = capSorted.findIndex(p => p.isMe) + 1;
-                
-                validStats.push({
-                    myScore: myEntry.totalScore,
-                    myRank: myRank,
-                    myKillRank: myKillRank,
-                    myCapRank: myCapRank,
-                    teamSize: processed.length,
-                    teamDetails: processed
-                });
+                const myRank = processed.findIndex(p => p.isMe) + 1; const myEntry = processed.find(p => p.isMe);
+                const killSorted = [...processed].sort((a, b) => b.killScore - a.killScore); const myKillRank = killSorted.findIndex(p => p.isMe) + 1;
+                const capSorted = [...processed].sort((a, b) => b.capScore - a.capScore); const myCapRank = capSorted.findIndex(p => p.isMe) + 1;
+                validStats.push({ myScore: myEntry.totalScore, myRank: myRank, myKillRank: myKillRank, myCapRank: myCapRank, teamSize: processed.length, teamDetails: processed });
             }
-
-            // 错误提示优化
-            if (validStats.length < 12) {
-                const scannedMsg = `(Scanned: ${idx}, Valid: ${validStats.length})`;
-                showError(`${t.err_insufficient_prefix} ${scannedMsg}${t.err_insufficient_suffix}`);
-                return;
-            }
-            
+            if (validStats.length < 12) { const scannedMsg = `(Scanned: ${idx}, Valid: ${validStats.length})`; showError(`${t.err_insufficient_prefix} ${scannedMsg}${t.err_insufficient_suffix}`); return; }
             const nameEl = document.getElementById('currentPlayerName');
-            if (mainPlayerName) {
-                nameEl.innerHTML = escapeHtml(mainPlayerName);
-                nameEl.classList.remove('hidden');
-                // 成功后加入历史
-                addToHistory(document.getElementById('steamInput').value, mainPlayerName);
-            } else {
-                nameEl.innerHTML = `ID: ${mainPlayerId}`;
-            }
-
-            const now = new Date();
-            document.getElementById('calcTime').innerText = "Calculated at: " + now.toLocaleTimeString();
-
+            if (mainPlayerName) { nameEl.innerHTML = escapeHtml(mainPlayerName); nameEl.classList.remove('hidden'); addToHistory(document.getElementById('steamInput').value, mainPlayerName); } else { nameEl.innerHTML = `ID: ${mainPlayerId}`; }
+            const now = new Date(); document.getElementById('calcTime').innerText = "Calculated at: " + now.toLocaleTimeString();
             renderResults(validStats);
         }
 
         function renderResults(stats) {
             const t = translations[currentLang];
-            
-            const avgRank = stats.reduce((sum, s) => sum + s.myRank, 0) / stats.length;
-            const avgKillRank = stats.reduce((sum, s) => sum + s.myKillRank, 0) / stats.length;
-            const avgCapRank = stats.reduce((sum, s) => sum + s.myCapRank, 0) / stats.length;
-
-            const normalizedRank = (avgRank - 1) / 4; 
-            const clampedNorm = Math.max(0, Math.min(1, normalizedRank));
-            const sCurveValue = (1 - Math.cos(clampedNorm * Math.PI)) / 2;
-            let maggotIndex = 1 + sCurveValue * 9;
-            
-            if (maggotIndex < 1) maggotIndex = 1;
-            if (maggotIndex > 10) maggotIndex = 10;
+            const avgRank = stats.reduce((sum, s) => sum + s.myRank, 0) / stats.length; const avgKillRank = stats.reduce((sum, s) => sum + s.myKillRank, 0) / stats.length; const avgCapRank = stats.reduce((sum, s) => sum + s.myCapRank, 0) / stats.length;
+            const normalizedRank = (avgRank - 1) / 4; const clampedNorm = Math.max(0, Math.min(1, normalizedRank)); const sCurveValue = (1 - Math.cos(clampedNorm * Math.PI)) / 2;
+            let maggotIndex = 1 + sCurveValue * 9; if (maggotIndex < 1) maggotIndex = 1; if (maggotIndex > 10) maggotIndex = 10;
 
             document.getElementById('resultPanel').classList.remove('hidden');
-            
-            const tagsContainer = document.getElementById('tagsContainer');
-            tagsContainer.innerHTML = ''; 
-
-            // Style Tag
-            const styleTag = document.createElement('div');
-            styleTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg";
-            if (avgKillRank <= avgCapRank) {
-                styleTag.innerText = t.tag_killer;
-                styleTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
-            } else {
-                styleTag.innerText = t.tag_capper;
-                styleTag.className += " bg-blue-900/80 border-blue-500 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]";
-            }
+            const tagsContainer = document.getElementById('tagsContainer'); tagsContainer.innerHTML = '';
+            const styleTag = document.createElement('div'); styleTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg";
+            if (avgKillRank <= avgCapRank) { styleTag.innerText = t.tag_killer; styleTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]"; } else { styleTag.innerText = t.tag_capper; styleTag.className += " bg-blue-900/80 border-blue-500 text-blue-200 shadow-[0_0_10px_rgba(59,130,246,0.5)]"; }
             tagsContainer.appendChild(styleTag);
-
-            // Trend Tag
             if (stats.length === 12) {
-                const recentStats = stats.slice(0, 3);
-                const prevStats = stats.slice(3, 12);
-                
-                const avgRecent = recentStats.reduce((sum, s) => sum + s.myRank, 0) / recentStats.length;
-                const avgPrev = prevStats.reduce((sum, s) => sum + s.myRank, 0) / prevStats.length;
-                
-                const trendTag = document.createElement('div');
-                trendTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg mt-1";
-                trendTag.style.animationDelay = "0.1s";
-
-                if (avgRecent < avgPrev - 0.3) { 
-                    trendTag.innerText = t.tag_trend_up; 
-                    trendTag.className += " bg-green-900/80 border-green-500 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.5)]";
-                } else if (avgRecent > avgPrev + 0.3) {
-                    trendTag.innerText = t.tag_trend_down; 
-                    trendTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]";
-                } else {
-                    trendTag.innerText = t.tag_trend_flat;
-                    trendTag.className += " bg-slate-700/80 border-slate-500 text-slate-300";
-                }
-                tagsContainer.appendChild(trendTag);
+                const recentStats = stats.slice(0, 3); const prevStats = stats.slice(3, 12); const avgRecent = recentStats.reduce((sum, s) => sum + s.myRank, 0) / recentStats.length; const avgPrev = prevStats.reduce((sum, s) => sum + s.myRank, 0) / prevStats.length; const trendTag = document.createElement('div'); trendTag.className = "tag-animation px-3 py-1 rounded text-xs font-bold border transform rotate-1 shadow-lg mt-1"; trendTag.style.animationDelay = "0.1s";
+                if (avgRecent < avgPrev - 0.3) { trendTag.innerText = t.tag_trend_up; trendTag.className += " bg-green-900/80 border-green-500 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.5)]"; } else if (avgRecent > avgPrev + 0.3) { trendTag.innerText = t.tag_trend_down; trendTag.className += " bg-red-900/80 border-red-500 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.5)]"; } else { trendTag.innerText = t.tag_trend_flat; trendTag.className += " bg-slate-700/80 border-slate-500 text-slate-300"; } tagsContainer.appendChild(trendTag);
             }
 
-            const scoreEl = document.getElementById('maggotScoreDisplay');
-            scoreEl.innerText = maggotIndex.toFixed(1);
-            
-            if (maggotIndex <= 3) scoreEl.className = "text-6xl font-black mb-1 text-green-400";
-            else if (maggotIndex <= 7) scoreEl.className = "text-6xl font-black mb-1 text-yellow-400";
-            else scoreEl.className = "text-6xl font-black mb-1 text-red-500";
+            const scoreEl = document.getElementById('maggotScoreDisplay'); scoreEl.innerText = maggotIndex.toFixed(1);
+            if (maggotIndex <= 3) scoreEl.className = "text-6xl font-black mb-1 text-green-400"; else if (maggotIndex <= 7) scoreEl.className = "text-6xl font-black mb-1 text-yellow-400"; else scoreEl.className = "text-6xl font-black mb-1 text-red-500";
+            let labelIndex = 0; if (maggotIndex <= 2) labelIndex = 0; else if (maggotIndex <= 4) labelIndex = 1; else if (maggotIndex <= 6) labelIndex = 2; else if (maggotIndex <= 8) labelIndex = 3; else labelIndex = 4; document.getElementById('maggotLabel').innerText = t.maggot_levels[labelIndex];
+            const percentage = ((maggotIndex - 1) / 9) * 100; document.getElementById('meterIndicator').style.left = `${percentage}%`;
+            document.getElementById('avgRank').innerText = avgRank.toFixed(1); document.getElementById('avgKillRank').innerText = avgKillRank.toFixed(1); document.getElementById('avgCapRank').innerText = avgCapRank.toFixed(1); document.getElementById('matchCount').innerText = stats.length;
 
-            let labelIndex = 0;
-            if (maggotIndex <= 2) labelIndex = 0;
-            else if (maggotIndex <= 4) labelIndex = 1;
-            else if (maggotIndex <= 6) labelIndex = 2;
-            else if (maggotIndex <= 8) labelIndex = 3;
-            else labelIndex = 4;
-            document.getElementById('maggotLabel').innerText = t.maggot_levels[labelIndex];
-
-            const percentage = ((maggotIndex - 1) / 9) * 100;
-            document.getElementById('meterIndicator').style.left = `${percentage}%`;
-
-            document.getElementById('avgRank').innerText = avgRank.toFixed(1);
-            document.getElementById('avgKillRank').innerText = avgKillRank.toFixed(1);
-            document.getElementById('avgCapRank').innerText = avgCapRank.toFixed(1);
-            document.getElementById('matchCount').innerText = stats.length;
-
-            const tbody = document.getElementById('matchTableBody');
-            tbody.innerHTML = "";
-            
+            const tbody = document.getElementById('matchTableBody'); tbody.innerHTML = "";
             stats.forEach((s) => {
-                const tr = document.createElement('tr');
-                tr.className = "match-row bg-slate-800 border-b border-slate-700";
-                
-                let scoreColor = "text-slate-300";
-                if (s.myRank === 1) scoreColor = "text-green-400 font-bold";
-                else if (s.myRank === 5) scoreColor = "text-red-400";
-
+                const tr = document.createElement('tr'); tr.className = "match-row bg-slate-800 border-b border-slate-700";
+                let scoreColor = "text-slate-300"; if (s.myRank === 1) scoreColor = "text-green-400 font-bold"; else if (s.myRank === 5) scoreColor = "text-red-400";
                 let teamHtml = `<div class="flex flex-col gap-1">`;
                 s.teamDetails.forEach(p => {
-                    const isMeClass = p.isMe ? "is-me" : "text-slate-400";
-                    const safeTeammateName = escapeHtml(p.name);
-                    teamHtml += `
-                        <div class="teammate-badge ${isMeClass}">
-                            <span class="truncate max-w-[120px]">${safeTeammateName}</span>
-                            <span>${p.totalScore.toFixed(2)}</span>
-                        </div>
-                    `;
-                });
-                teamHtml += `</div>`;
-
-                let statusLabel = "";
-                if (s.myRank === 1) {
-                    statusLabel = `<span class="px-2 py-1 rounded bg-green-900 text-green-300 text-xs font-bold whitespace-nowrap">${t.label_carry}</span>`;
-                } else if (s.myRank === 5) {
-                    statusLabel = `<span class="px-2 py-1 rounded bg-red-900 text-red-300 text-xs font-bold whitespace-nowrap">${t.label_pot}</span>`;
-                } else {
-                    statusLabel = `<span class="px-2 py-1 rounded bg-blue-900 text-blue-300 text-xs whitespace-nowrap">${t.label_normal}</span>`;
-                }
-
-                const detailedRanks = `
-                    <div class="mt-1 flex gap-1 justify-center">
-                        <span class="rank-pill rank-pill-kill" title="Kill Rank">K#${s.myKillRank}</span>
-                        <span class="rank-pill rank-pill-cap" title="Cap Rank">C#${s.myCapRank}</span>
-                    </div>
-                `;
-
-                tr.innerHTML = `
-                    <td class="px-6 py-4 align-top ${scoreColor} text-lg font-mono">${s.myScore.toFixed(2)}</td>
-                    <td class="px-6 py-4 align-top">${teamHtml}</td>
-                    <td class="px-6 py-4 align-top text-center">${statusLabel}${detailedRanks}</td>
-                `;
+                    const isMeClass = p.isMe ? "is-me" : "text-slate-400"; const safeTeammateName = escapeHtml(p.name);
+                    // 点击队友执行名字搜索
+                    const nameHtml = `<span class="teammate-link" onclick="inspectTeammateByName('${safeTeammateName}')" title="搜此人成分">${safeTeammateName}</span>`;
+                    teamHtml += `<div class="teammate-badge ${isMeClass}"><span class="truncate max-w-[120px]">${nameHtml}</span><span>${p.totalScore.toFixed(2)}</span></div>`;
+                }); teamHtml += `</div>`;
+                let statusLabel = ""; if (s.myRank === 1) statusLabel = `<span class="px-2 py-1 rounded bg-green-900 text-green-300 text-xs font-bold whitespace-nowrap">${t.label_carry}</span>`; else if (s.myRank === 5) statusLabel = `<span class="px-2 py-1 rounded bg-red-900 text-red-300 text-xs font-bold whitespace-nowrap">${t.label_pot}</span>`; else statusLabel = `<span class="px-2 py-1 rounded bg-blue-900 text-blue-300 text-xs whitespace-nowrap">${t.label_normal}</span>`;
+                const detailedRanks = `<div class="mt-1 flex gap-1 justify-center"><span class="rank-pill rank-pill-kill" title="Kill Rank">K#${s.myKillRank}</span><span class="rank-pill rank-pill-cap" title="Cap Rank">C#${s.myCapRank}</span></div>`;
+                tr.innerHTML = `<td class="px-6 py-4 align-top ${scoreColor} text-lg font-mono">${s.myScore.toFixed(2)}</td><td class="px-6 py-4 align-top">${teamHtml}</td><td class="px-6 py-4 align-top text-center">${statusLabel}${detailedRanks}</td>`;
                 tbody.appendChild(tr);
             });
         }
-
-        function showError(msg) {
-            document.getElementById('errorMsg').classList.remove('hidden');
-            document.getElementById('errorText').innerText = msg;
-        }
+        function showError(msg) { document.getElementById('errorMsg').classList.remove('hidden'); document.getElementById('errorText').innerText = msg; }
     </script>
 </body>
 </html>
-
