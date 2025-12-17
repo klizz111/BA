@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Arrow Maggot Index v3.6 - Readability Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* 比例条样式 */
+        .bar-container { background: rgba(0,0,0,0.5); height: 8px; border-radius: 4px; overflow: hidden; flex: 1; }
+        .bar-kill { background: #22c55e; height: 100%; transition: width 0.6s ease-out; }
+        .bar-loss { background: #ef4444; height: 100%; transition: width 0.6s ease-out; }
+        .bar-obj { background: #3b82f6; height: 100%; transition: width 0.6s ease-out; }
+
+        /* 进度条 */
+        .load-progress-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; margin: 12px 0; }
+        .load-progress-fill { width: 0%; height: 100%; background: #06b6d4; transition: width 0.4s ease; box-shadow: 0 0 15px rgba(6,182,212,0.6); }
+
+        /* 蛆指数仪表盘 */
+        .maggot-meter-bg { background: linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%); height: 18px; border-radius: 9px; position: relative; }
+        .maggot-indicator { position: absolute; top: -4px; width: 6px; height: 26px; background: white; border: 2px solid #000; transform: translateX(-50%); transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* 右上角贴纸 Tag - 增大文字和内边距 */
+        .tag-sticker-container { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; z-index: 30; }
+        .tag-sticker { 
+            padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-weight: 900; font-style: italic; font-size: 0.9rem;
+            text-transform: uppercase; transform: rotate(8deg); box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            border-width: 2px; animation: tagPop 0.5s ease-out forwards; opacity: 0;
+        }
+        @keyframes tagPop { from { opacity: 0; transform: scale(0.5) rotate(20deg); } to { opacity: 1; transform: scale(1) rotate(8deg); } }
+
+        .teammate-row { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); height: 72px; }
+        .teammate-row:hover { background: rgba(255,255,255,0.05); }
+        .is-me { background: rgba(6, 182, 212, 0.15) !important; border-left: 5px solid #06b6d4; }
+        
+        /* 增加 ID 链接的可读性 */
+        .id-link { cursor: pointer; color: #94a3b8; font-family: ui-monospace, monospace; font-size: 0.8rem; border-bottom: 1px dotted #64748b; }
+        .id-link:hover { color: #22d3ee; border-bottom-color: #22d3ee; }
+
+        .history-chip { font-size: 0.85rem; padding: 6px 14px; background: #1e293b; border: 1px solid #475569; border-radius: 99px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+        .history-chip:hover { border-color: #06b6d4; color: #22d3ee; background: #0f172a; }
+        .history-del { font-size: 1.1rem; line-height: 1; opacity: 0.5; }
+
+        .result-fade { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen pt-10 px-4 pb-24">
+
+    <div class="w-full max-w-6xl mx-auto flex justify-between items-center mb-8 px-2">
+        <div class="flex gap-4 items-center">
+            <div class="text-xs text-slate-400 font-mono tracking-widest uppercase font-bold">v3.6 Readability Pro</div>
+            <a href="old.html" class="px-3 py-1 text-xs rounded-md border border-slate-600 text-slate-300 hover:bg-slate-800 transition font-bold" id="lbl_old_ver">Old Version</a>
+        </div>
+        <div class="flex gap-2 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+            <button onclick="setLang('en')" id="btn_lang_en" class="px-4 py-1.5 text-xs rounded-lg transition font-bold">English</button>
+            <button onclick="setLang('zh')" id="btn_lang_zh" class="px-4 py-1.5 text-xs rounded-lg transition font-bold">中文</button>
+        </div>
+    </div>
+
+    <div class="glass-panel w-full max-w-6xl mx-auto rounded-[2.5rem] p-10 shadow-2xl border-white/5">
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-black text-white tracking-tighter mb-4" id="lbl_title">断箭蛆指数</h1>
+            <div class="flex justify-center gap-6 mb-4">
+                <a href="https://barmory.net/" target="_blank" class="text-xs text-slate-400 border border-slate-700 px-3 py-1 rounded-full hover:bg-slate-700 hover:text-white transition-all font-medium">Data Source: Barmory.net</a>
+            </div>
+            <p class="text-cyan-400 font-mono text-sm uppercase tracking-[0.4em] font-bold" id="lbl_subtitle">Broken Arrow Maggot Index</p>
+        </div>
+
+        <div class="flex flex-col items-center mb-16">
+            <div class="flex flex-col md:flex-row gap-4 w-full max-w-2xl">
+                <input type="text" id="steamInput" class="flex-1 bg-slate-900 border-2 border-slate-700 text-white p-5 rounded-2xl text-center text-lg focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-500 outline-none transition-all placeholder-slate-600 shadow-2xl font-medium">
+                <button onclick="handleCheck()" id="btn_check" class="bg-cyan-600 hover:bg-cyan-500 text-white font-black px-12 py-5 rounded-2xl shadow-xl transform active:scale-95 transition-all text-lg whitespace-nowrap">开始检测</button>
+            </div>
+            <div id="historyContainer" class="flex flex-wrap justify-center gap-3 mt-8"></div>
+        </div>
+
+        <div id="loading" class="hidden text-center py-12 max-w-lg mx-auto">
+            <div class="flex justify-between text-sm font-bold text-slate-300 mb-2">
+                <span id="loadStatus">Initializing...</span>
+                <span id="loadPercent">0%</span>
+            </div>
+            <div class="load-progress-bg"><div id="loadProgressFill" class="load-progress-fill"></div></div>
+            <p class="text-xs text-slate-500 mt-3 font-mono font-medium" id="loadDetail">Synchronizing Data Chains...</p>
+        </div>
+
+        <div id="errorArea" class="hidden mb-10 max-w-2xl mx-auto bg-red-900/30 border border-red-500/50 text-red-100 p-6 rounded-3xl text-base text-center font-bold">
+            <span id="errorMsg">Unknown Error</span>
+        </div>
+
+        <div id="resultPanel" class="hidden result-fade">
+            <div class="bg-slate-800/60 rounded-[3rem] p-12 border border-white/10 flex flex-col items-center mb-16 relative overflow-hidden">
+                <div class="tag-sticker-container">
+                    <div id="styleTag" class="tag-sticker bg-cyan-900 border-cyan-400 text-cyan-50 text-xl"></div>
+                    <div id="trendTag" class="tag-sticker bg-slate-700 border-slate-400 text-slate-100"></div>
+                </div>
+
+                <h2 class="text-slate-400 text-sm font-black uppercase tracking-[0.2em] mb-6" id="lbl_maggot_index_title">蛆指数</h2>
+                <div class="text-[10rem] font-black text-white leading-none mb-6" id="maggotScoreDisplay" style="text-shadow: 0 10px 50px rgba(0,0,0,0.4);">1.0</div>
+                <div id="maggotLabel" class="text-3xl font-black px-10 py-3 rounded-full bg-slate-900 border-2 border-white/10 shadow-2xl mb-12">Unknown</div>
+                
+                <div class="w-full max-w-3xl mb-12">
+                    <div class="flex justify-between text-xs text-slate-400 mb-4 uppercase font-black tracking-widest">
+                        <span id="lbl_god_range">神</span><span id="lbl_avg_range">中庸</span><span id="lbl_maggot_range">蛆</span>
+                    </div>
+                    <div class="maggot-meter-bg"><div id="meterIndicator" class="maggot-indicator" style="left: 0%;"></div></div>
+                </div>
+
+                <div class="w-full max-w-5xl grid grid-cols-2 md:grid-cols-5 gap-6 pt-10 border-t-2 border-white/5">
+                    <div class="text-center">
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_kdr">平均 KD 排名</div>
+                        <div class="text-2xl font-mono font-black text-cyan-400" id="ref_avgKDR">#0.0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_kr">平均击杀排名</div>
+                        <div class="text-2xl font-mono font-black text-green-400" id="ref_avgKR">#0.0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_dr">平均损失排名</div>
+                        <div class="text-2xl font-mono font-black text-red-400" id="ref_avgDR">#0.0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_or">平均占点排名</div>
+                        <div class="text-2xl font-mono font-black text-blue-400" id="ref_avgOR">#0.0</div>
+                    </div>
+                    <div class="text-center col-span-2 md:col-span-1">
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_wr">最近 12 局胜率</div>
+                        <div class="text-2xl font-mono font-black text-yellow-400" id="ref_WR">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6 mb-12">
+                <div class="h-[2px] flex-1 bg-white/10"></div>
+                <h3 class="text-2xl font-black text-slate-200 uppercase tracking-widest" id="lbl_history_title">最近 12 局有效对局</h3>
+                <div class="h-[2px] flex-1 bg-white/10"></div>
+            </div>
+            <div id="matchesContainer" class="space-y-16"></div>
+        </div>
+    </div>
+
+    <script>
+        // 配置和字典保持不变，但 UI 渲染部分调大字体
+        const CONFIG = {
+            MATCH_GOAL: 12,
+            MIN_PLAYERS: 10,
+            PROXIES: [
+                { name: "Codetabs", url: (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` },
+                { name: "CorsProxy", url: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}` },
+                { name: "AllOrigins", url: (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}&cb=${Date.now()}` }
+            ]
+        };
+
+        const DICT = {
+            zh: {
+                title: "断箭蛆指数", subtitle: "Broken Arrow Maggot Index", placeholder: "Steam64 ID 或 数字 ID...",
+                check: "开始检测", loading: "同步中...", maggot_index_title: "蛆指数",
+                god_range: "神", avg_range: "中庸", maggot_range: "蛆",
+                history_title: "最近 12 局有效对局", ally: "己方队伍", enemy: "敌方队伍",
+                kill: "击杀", loss: "损失", obj: "占点",
+                levels: ["👑 神", "🦁 团队支柱", "😐 平平无奇", "🐛 有点蛆", "💩 蛆！"],
+                tag_killer: "⚔️ 击杀为主", tag_kd: "📈 KD 为主", tag_obj: "🚩 占点为主",
+                trend_up: "🚀 最近猛如虎", trend_down: "📉 最近变蛆了", trend_flat: "➡️ 稳如泰山",
+                err_net: "网络拥塞，请稍后再试", err_insufficient: "有效对局不足 12 局",
+                old_ver: "旧版入口", lbl_ref_kdr: "平均 KD 排名", lbl_ref_kr: "平均击杀排名",
+                lbl_ref_dr: "平均损失排名", lbl_ref_or: "平均占点排名", lbl_ref_wr: "最近 12 局胜率"
+            },
+            en: {
+                title: "Maggot Index", subtitle: "Broken Arrow Performance Index", placeholder: "Enter Steam64 ID or Numeric ID...",
+                check: "ANALYZE", loading: "Syncing...", maggot_index_title: "MAGGOT INDEX",
+                god_range: "GOD", avg_range: "AVG", maggot_range: "MAGGOT",
+                history_title: "Last 12 Valid Matches", ally: "Ally Team", enemy: "Enemy Team",
+                kill: "Kill", loss: "Loss", obj: "OBJ",
+                levels: ["👑 GOD", "🦁 Pillar", "😐 Average", "🐛 Bit Maggot", "💩 Maggot!"],
+                tag_killer: "⚔️ Kill Focus", tag_kd: "📈 KD Focus", tag_obj: "🚩 Obj Focus",
+                trend_up: "🚀 Improving", trend_down: "📉 Getting Worse", trend_flat: "➡️ Stable",
+                err_net: "Network error, please retry", err_insufficient: "Insufficient valid matches",
+                old_ver: "Old Version", lbl_ref_kdr: "Avg KD Rank", lbl_ref_kr: "Avg Kill Rank",
+                lbl_ref_dr: "Avg Loss Rank", lbl_ref_or: "Avg Obj Rank", lbl_ref_wr: "Win Rate (12G)"
+            }
+        };
+
+        let currentLang = 'zh';
+        const HISTORY_KEY = 'ba_maggot_v36_history';
+
+        function setLang(l) {
+            currentLang = l; localStorage.setItem('ba_lang', l); updateUIStrings();
+        }
+
+        function updateUIStrings() {
+            const t = DICT[currentLang];
+            document.getElementById('lbl_title').innerText = t.title;
+            document.getElementById('lbl_subtitle').innerText = t.subtitle;
+            document.getElementById('steamInput').placeholder = t.placeholder;
+            document.getElementById('btn_check').innerText = t.check;
+            document.getElementById('lbl_maggot_index_title').innerText = t.maggot_index_title;
+            document.getElementById('lbl_god_range').innerText = t.god_range;
+            document.getElementById('lbl_avg_range').innerText = t.avg_range;
+            document.getElementById('lbl_maggot_range').innerText = t.maggot_range;
+            document.getElementById('lbl_history_title').innerText = t.history_title;
+            document.getElementById('lbl_old_ver').innerText = t.old_ver;
+            document.getElementById('lbl_ref_kdr').innerText = t.lbl_ref_kdr;
+            document.getElementById('lbl_ref_kr').innerText = t.lbl_ref_kr;
+            document.getElementById('lbl_ref_dr').innerText = t.lbl_ref_dr;
+            document.getElementById('lbl_ref_or').innerText = t.lbl_ref_or;
+            document.getElementById('lbl_ref_wr').innerText = t.lbl_ref_wr;
+            document.getElementById('btn_lang_zh').className = `px-5 py-1.5 text-xs rounded-lg transition font-bold ${currentLang==='zh'?'bg-cyan-600 text-white shadow-lg shadow-cyan-900/40':'text-slate-400 hover:text-white'}`;
+            document.getElementById('btn_lang_en').className = `px-5 py-1.5 text-xs rounded-lg transition font-bold ${currentLang==='en'?'bg-cyan-600 text-white shadow-lg shadow-cyan-900/40':'text-slate-400 hover:text-white'}`;
+        }
+
+        async function robustFetch(url, attempt = 0) {
+            const proxy = CONFIG.PROXIES[attempt % CONFIG.PROXIES.length];
+            try {
+                const r = await fetch(proxy.url(url));
+                if(!r.ok) throw new Error(`HTTP_${r.status}`);
+                const d = await r.json();
+                return d.contents ? JSON.parse(d.contents) : d;
+            } catch (e) {
+                if (attempt < 4) return robustFetch(url, attempt + 1);
+                throw e;
+            }
+        }
+
+        window.onload = () => {
+            setLang(localStorage.getItem('ba_lang') || 'zh');
+            renderHistory();
+            const urlId = new URLSearchParams(window.location.search).get('steamId');
+            if(urlId) { document.getElementById('steamInput').value=urlId; handleCheck(); }
+        };
+
+        function renderHistory() {
+            const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = h.map(x => `
+                <div class="history-chip">
+                    <span class="font-bold" onclick="useHistory('${x.id}')">${escapeHtml(x.name)}</span>
+                    <span class="history-del cursor-pointer" onclick="event.stopPropagation(); removeHistory('${x.id}')">×</span>
+                </div>
+            `).join('');
+        }
+        function useHistory(id) { document.getElementById('steamInput').value = id; handleCheck(); }
+        function removeHistory(id) {
+            let h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(h.filter(x => x.id !== id)));
+            renderHistory();
+        }
+
+        function updateProgress(percent, status, detail) {
+            document.getElementById('loadPercent').innerText = percent + '%';
+            document.getElementById('loadProgressFill').style.width = percent + '%';
+            document.getElementById('loadStatus').innerText = status;
+            document.getElementById('loadDetail').innerText = detail;
+        }
+
+        async function handleCheck() {
+            const input = document.getElementById('steamInput').value.trim();
+            if(!input) return;
+            const t = DICT[currentLang];
+            
+            document.getElementById('errorArea').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('resultPanel').classList.add('hidden');
+            updateProgress(0, t.loading, "Initializing...");
+
+            try {
+                let uid = input;
+                if (input.length > 10 || isNaN(input)) {
+                    updateProgress(5, "Resolving...", "Checking Identity...");
+                    const sData = await robustFetch(`https://www.barmory.net/stb/commander/${input}/steam`);
+                    uid = String(sData.id);
+                }
+
+                updateProgress(10, "Scanning...", "Pulling Matches...");
+                const time = new Date().toISOString().split('T')[0] + '_' + new Date().getHours().toString().padStart(2,'0');
+                const matchList = await robustFetch(`https://www.barmory.net/stb/commander/${uid}/matches?time=${time}`);
+                
+                const validMatches = [];
+                for(let i=0; i < matchList.length && validMatches.length < CONFIG.MATCH_GOAL; i++) {
+                    const mId = matchList[i];
+                    try {
+                        const detail = await robustFetch(`https://www.barmory.net/stb/match/${mId}`);
+                        const players = Object.values(detail.Data);
+                        const hasEloChange = players.some(p => Math.abs(p.NewRating - p.OldRating) > 0.01);
+                        if(players.length >= CONFIG.MIN_PLAYERS && hasEloChange) {
+                            validMatches.push({ id: mId, data: detail });
+                            const prg = Math.round((validMatches.length / CONFIG.MATCH_GOAL) * 100);
+                            updateProgress(prg, `Syncing (${validMatches.length}/12)`, `Match ${mId} OK`);
+                        }
+                    } catch(e) { console.error(`Match ${mId} Failed`, e); }
+                    await new Promise(r => setTimeout(r, 600)); 
+                }
+
+                if(validMatches.length < CONFIG.MATCH_GOAL) throw new Error(t.err_insufficient);
+                
+                saveHistory(uid, validMatches[0].data.Data[uid]?.Name);
+                processFinalData(uid, validMatches);
+
+            } catch (e) {
+                document.getElementById('errorArea').classList.remove('hidden');
+                document.getElementById('errorMsg').innerText = e.message;
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        function processFinalData(myUid, matches) {
+            let kRankSum = 0, oRankSum = 0, kdRankSum = 0, lossRankSum = 0, wins = 0;
+
+            const stats = matches.map(m => {
+                const data = m.data.Data;
+                const me = data[myUid];
+                const myTeamId = me.TeamId;
+                const players = Object.values(data);
+                const isTeamWin = players.filter(p => p.TeamId === myTeamId).some(p => (p.NewRating - p.OldRating) > 0.01);
+                if(isTeamWin) wins++;
+
+                const maxK = Math.max(...players.map(p => p.DestructionScore || 0), 1);
+                const maxL = Math.max(...players.map(p => p.LossesScore || 0), 1);
+                const maxO = Math.max(...players.map(p => p.ObjectivesCaptured || 0), 1);
+                
+                const mapPlayer = (p) => {
+                    const k = p.DestructionScore || 0, l = p.LossesScore || 0;
+                    return {
+                        id: p.Id, name: p.Name || 'Unknown', elo: p.NewRating.toFixed(0),
+                        gain: (p.NewRating - p.OldRating).toFixed(1),
+                        kPct: (k / maxK) * 100, lPct: (l / maxL) * 100, oPct: ((p.ObjectivesCaptured || 0) / maxO) * 100,
+                        isMe: String(p.Id) === String(myUid),
+                        score: (k - l) / 1000 + (p.ObjectivesCaptured || 0),
+                        kScore: k, lScore: l, oScore: p.ObjectivesCaptured || 0, kd: k / (l || 1)
+                    };
+                };
+
+                const ally = players.filter(p => p.TeamId === myTeamId).map(mapPlayer).sort((a,b)=>b.score - a.score);
+                const enemy = players.filter(p => p.TeamId !== myTeamId).map(mapPlayer).sort((a,b)=>b.score - a.score);
+
+                kRankSum += ([...ally].sort((a,b)=>b.kScore - a.kScore).findIndex(p=>p.isMe) + 1);
+                oRankSum += ([...ally].sort((a,b)=>b.oScore - a.oScore).findIndex(p=>p.isMe) + 1);
+                kdRankSum += ([...ally].sort((a,b)=>b.kd - a.kd).findIndex(p=>p.isMe) + 1);
+                lossRankSum += ([...ally].sort((a,b)=>b.lScore - a.lScore).findIndex(p=>p.isMe) + 1);
+
+                return { id: m.id, myRank: ally.findIndex(p => p.isMe) + 1, ally, enemy };
+            });
+            renderResults(stats, kRankSum/12, kdRankSum/12, oRankSum/12, lossRankSum/12, wins);
+        }
+
+        function renderResults(stats, avgKR, avgKDR, avgOR, avgDR, wins) {
+            const t = DICT[currentLang];
+            document.getElementById('resultPanel').classList.remove('hidden');
+            const avgRank = stats.reduce((a,b) => a + b.myRank, 0) / stats.length;
+            const maggotIndex = (1 + ((1 - Math.cos(Math.max(0, Math.min(1, (avgRank-1)/4)) * Math.PI)) / 2) * 9).toFixed(1);
+
+            const display = document.getElementById('maggotScoreDisplay');
+            display.innerText = maggotIndex;
+            display.style.color = maggotIndex <= 3.5 ? '#4ade80' : (maggotIndex <= 7 ? '#facc15' : '#f87171');
+            document.getElementById('maggotLabel').innerText = t.levels[maggotIndex <= 2 ? 0 : (maggotIndex <= 4 ? 1 : (maggotIndex <= 6 ? 2 : (maggotIndex <= 8 ? 3 : 4)))];
+            document.getElementById('meterIndicator').style.left = `${((maggotIndex-1)/9)*100}%`;
+
+            document.getElementById('ref_avgKDR').innerText = `#${avgKDR.toFixed(1)}`;
+            document.getElementById('ref_avgKR').innerText = `#${avgKR.toFixed(1)}`;
+            document.getElementById('ref_avgDR').innerText = `#${avgDR.toFixed(1)}`;
+            document.getElementById('ref_avgOR').innerText = `#${avgOR.toFixed(1)}`;
+            document.getElementById('ref_WR').innerText = Math.round((wins / stats.length) * 100) + '%';
+
+            const minRank = Math.min(avgKR, avgKDR, avgOR);
+            const styleEl = document.getElementById('styleTag');
+            if (avgKR === minRank) styleEl.innerText = t.tag_killer;
+            else if (avgKDR === minRank) styleEl.innerText = t.tag_kd;
+            else styleEl.innerText = t.tag_obj;
+
+            const recentAvg = stats.slice(0,3).reduce((a,b)=>a+b.myRank,0)/3;
+            const oldAvg = stats.slice(3).reduce((a,b)=>a+b.myRank,0)/9;
+            document.getElementById('trendTag').innerText = recentAvg < oldAvg - 0.4 ? t.trend_up : (recentAvg > oldAvg + 0.4 ? t.trend_down : t.trend_flat);
+
+            document.getElementById('matchesContainer').innerHTML = stats.map(m => `
+                <div class="glass-panel rounded-[3rem] overflow-hidden border-white/10 shadow-2xl">
+                    <div class="bg-white/5 px-8 py-4 flex justify-between items-center text-xs font-bold font-mono text-slate-400">
+                        <span>MATCH ID: ${m.id}</span>
+                        <span class="px-4 py-1 bg-cyan-600/20 text-cyan-400 rounded-lg font-black uppercase tracking-widest">Rank #${m.myRank} / Ally</span>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-px bg-white/10">
+                        <div class="bg-[#0f172a] p-6"><h4 class="text-xs font-black text-cyan-500 mb-6 uppercase tracking-[0.2em]">${t.ally}</h4>${renderTeam(m.ally, t)}</div>
+                        <div class="bg-[#0f172a] p-6"><h4 class="text-xs font-black text-red-500 mb-6 uppercase tracking-[0.2em]">${t.enemy}</h4>${renderTeam(m.enemy, t)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTeam(players, t) {
+            return players.map(p => {
+                const hoverDetail = `${t.kill}: ${p.kScore.toLocaleString()} | ${t.loss}: ${p.lScore.toLocaleString()} | ${t.obj}: ${p.oScore}`;
+                return `
+                <div class="teammate-row flex items-center p-3 rounded-2xl ${p.isMe?'is-me':''}" title="${hoverDetail}">
+                    <div class="flex-1 min-w-0 pr-6">
+                        <div class="text-sm font-black text-slate-100 truncate mb-0.5">${escapeHtml(p.name)}</div>
+                        <div class="id-link" onclick="inspect('${p.id}')">${p.id}</div>
+                    </div>
+                    <div class="w-20 text-right mr-6 font-mono">
+                        <div class="text-xs font-bold text-slate-400">${p.elo}</div>
+                        <div class="text-[11px] font-black ${parseFloat(p.gain)>=0?'text-green-500':'text-red-500'}">${parseFloat(p.gain)>=0?'+':''}${p.gain}</div>
+                    </div>
+                    <div class="w-32 space-y-1.5">
+                        <div class="flex items-center gap-3"><span class="text-[10px] font-black text-slate-500 w-6 uppercase">${t.kill}</span><div class="bar-container"><div class="bar-kill" style="width:${p.kPct}%"></div></div></div>
+                        <div class="flex items-center gap-3"><span class="text-[10px] font-black text-slate-500 w-6 uppercase">${t.loss}</span><div class="bar-container"><div class="bar-loss" style="width:${p.lPct}%"></div></div></div>
+                        <div class="flex items-center gap-3"><span class="text-[10px] font-black text-slate-500 w-6 uppercase">${t.obj}</span><div class="bar-container"><div class="bar-obj" style="width:${p.oPct}%"></div></div></div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function saveHistory(id, name) {
+            let h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            h = h.filter(x => x.id !== id);
+            h.unshift({ id, name: name || id });
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, 10)));
+            renderHistory();
+        }
+        function inspect(id) { 
+            const newUrl = window.location.origin + window.location.pathname + '?steamId=' + id;
+            window.open(newUrl, '_blank'); 
+        }
+        function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    </script>
+</body>
+</html>
