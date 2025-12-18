@@ -3,47 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broken Arrow Maggot Index v3.6 - Readability Pro</title>
+    <title>Broken Arrow Maggot Index v3.7 - By Zola</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         .glass-panel { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        /* 比例条样式 */
         .bar-container { background: rgba(0,0,0,0.5); height: 8px; border-radius: 4px; overflow: hidden; flex: 1; }
         .bar-kill { background: #22c55e; height: 100%; transition: width 0.6s ease-out; }
         .bar-loss { background: #ef4444; height: 100%; transition: width 0.6s ease-out; }
         .bar-obj { background: #3b82f6; height: 100%; transition: width 0.6s ease-out; }
-
-        /* 进度条 */
         .load-progress-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; margin: 12px 0; }
         .load-progress-fill { width: 0%; height: 100%; background: #06b6d4; transition: width 0.4s ease; box-shadow: 0 0 15px rgba(6,182,212,0.6); }
-
-        /* 蛆指数仪表盘 */
         .maggot-meter-bg { background: linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%); height: 18px; border-radius: 9px; position: relative; }
         .maggot-indicator { position: absolute; top: -4px; width: 6px; height: 26px; background: white; border: 2px solid #000; transform: translateX(-50%); transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-        /* 右上角贴纸 Tag - 增大文字和内边距 */
         .tag-sticker-container { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; z-index: 30; }
-        .tag-sticker { 
-            padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-weight: 900; font-style: italic; font-size: 0.9rem;
-            text-transform: uppercase; transform: rotate(8deg); box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-            border-width: 2px; animation: tagPop 0.5s ease-out forwards; opacity: 0;
-        }
+        .tag-sticker { padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-weight: 900; font-style: italic; font-size: 0.9rem; text-transform: uppercase; transform: rotate(8deg); box-shadow: 0 6px 15px rgba(0,0,0,0.4); border-width: 2px; animation: tagPop 0.5s ease-out forwards; opacity: 0; }
         @keyframes tagPop { from { opacity: 0; transform: scale(0.5) rotate(20deg); } to { opacity: 1; transform: scale(1) rotate(8deg); } }
-
         .teammate-row { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); height: 72px; }
         .teammate-row:hover { background: rgba(255,255,255,0.05); }
         .is-me { background: rgba(6, 182, 212, 0.15) !important; border-left: 5px solid #06b6d4; }
-        
-        /* 增加 ID 链接的可读性 */
         .id-link { cursor: pointer; color: #94a3b8; font-family: ui-monospace, monospace; font-size: 0.8rem; border-bottom: 1px dotted #64748b; }
         .id-link:hover { color: #22d3ee; border-bottom-color: #22d3ee; }
-
         .history-chip { font-size: 0.85rem; padding: 6px 14px; background: #1e293b; border: 1px solid #475569; border-radius: 99px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .history-chip:hover { border-color: #06b6d4; color: #22d3ee; background: #0f172a; }
         .history-del { font-size: 1.1rem; line-height: 1; opacity: 0.5; }
-
         .result-fade { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -52,8 +35,7 @@
 
     <div class="w-full max-w-6xl mx-auto flex justify-between items-center mb-8 px-2">
         <div class="flex gap-4 items-center">
-            <div class="text-xs text-slate-400 font-mono tracking-widest uppercase font-bold">v3.6 Readability Pro</div>
-            <a href="old.html" class="px-3 py-1 text-xs rounded-md border border-slate-600 text-slate-300 hover:bg-slate-800 transition font-bold" id="lbl_old_ver">Old Version</a>
+            <div class="text-xs text-slate-400 font-mono tracking-widest uppercase font-bold">v3.7 Cosine Edition</div>
         </div>
         <div class="flex gap-2 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
             <button onclick="setLang('en')" id="btn_lang_en" class="px-4 py-1.5 text-xs rounded-lg transition font-bold">English</button>
@@ -63,7 +45,10 @@
 
     <div class="glass-panel w-full max-w-6xl mx-auto rounded-[2.5rem] p-10 shadow-2xl border-white/5">
         <div class="text-center mb-12">
-            <h1 class="text-6xl font-black text-white tracking-tighter mb-4" id="lbl_title">断箭蛆指数</h1>
+            <h1 class="text-6xl font-black text-white tracking-tighter mb-4">
+                <span id="lbl_title">断箭蛆指数</span>
+                <span class="text-xl text-cyan-500 italic ml-4 opacity-80 font-serif">By Zola</span>
+            </h1>
             <div class="flex justify-center gap-6 mb-4">
                 <a href="https://barmory.net/" target="_blank" class="text-xs text-slate-400 border border-slate-700 px-3 py-1 rounded-full hover:bg-slate-700 hover:text-white transition-all font-medium">Data Source: Barmory.net</a>
             </div>
@@ -98,7 +83,12 @@
                     <div id="trendTag" class="tag-sticker bg-slate-700 border-slate-400 text-slate-100"></div>
                 </div>
 
-                <h2 class="text-slate-400 text-sm font-black uppercase tracking-[0.2em] mb-6" id="lbl_maggot_index_title">蛆指数</h2>
+                <div class="text-center mb-4">
+                    <div id="userNameDisplay" class="text-3xl font-black text-white mb-1">Commander Name</div>
+                    <div id="calcTimeDisplay" class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Calculated: 2024-01-01 00:00:00</div>
+                </div>
+
+                <h2 class="text-slate-400 text-sm font-black uppercase tracking-[0.2em] mb-2" id="lbl_maggot_index_title">蛆指数</h2>
                 <div class="text-[10rem] font-black text-white leading-none mb-6" id="maggotScoreDisplay" style="text-shadow: 0 10px 50px rgba(0,0,0,0.4);">1.0</div>
                 <div id="maggotLabel" class="text-3xl font-black px-10 py-3 rounded-full bg-slate-900 border-2 border-white/10 shadow-2xl mb-12">Unknown</div>
                 
@@ -119,7 +109,7 @@
                         <div class="text-2xl font-mono font-black text-green-400" id="ref_avgKR">#0.0</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_dr">平均损失排名</div>
+                        <div class="text-xs text-slate-500 uppercase font-black mb-2" id="lbl_ref_dr">爱兵如子排名</div>
                         <div class="text-2xl font-mono font-black text-red-400" id="ref_avgDR">#0.0</div>
                     </div>
                     <div class="text-center">
@@ -143,7 +133,6 @@
     </div>
 
     <script>
-        // 配置和字典保持不变，但 UI 渲染部分调大字体
         const CONFIG = {
             MATCH_GOAL: 12,
             MIN_PLAYERS: 10,
@@ -165,8 +154,8 @@
                 tag_killer: "⚔️ 击杀为主", tag_kd: "📈 KD 为主", tag_obj: "🚩 占点为主",
                 trend_up: "🚀 最近猛如虎", trend_down: "📉 最近变蛆了", trend_flat: "➡️ 稳如泰山",
                 err_net: "网络拥塞，请稍后再试", err_insufficient: "有效对局不足 12 局",
-                old_ver: "旧版入口", lbl_ref_kdr: "平均 KD 排名", lbl_ref_kr: "平均击杀排名",
-                lbl_ref_dr: "平均损失排名", lbl_ref_or: "平均占点排名", lbl_ref_wr: "最近 12 局胜率"
+                lbl_ref_kdr: "平均 KD 排名", lbl_ref_kr: "平均击杀排名",
+                lbl_ref_dr: "爱兵如子排名", lbl_ref_or: "平均占点排名", lbl_ref_wr: "最近 12 局胜率"
             },
             en: {
                 title: "Maggot Index", subtitle: "Broken Arrow Performance Index", placeholder: "Enter Steam64 ID or Numeric ID...",
@@ -178,13 +167,13 @@
                 tag_killer: "⚔️ Kill Focus", tag_kd: "📈 KD Focus", tag_obj: "🚩 Obj Focus",
                 trend_up: "🚀 Improving", trend_down: "📉 Getting Worse", trend_flat: "➡️ Stable",
                 err_net: "Network error, please retry", err_insufficient: "Insufficient valid matches",
-                old_ver: "Old Version", lbl_ref_kdr: "Avg KD Rank", lbl_ref_kr: "Avg Kill Rank",
-                lbl_ref_dr: "Avg Loss Rank", lbl_ref_or: "Avg Obj Rank", lbl_ref_wr: "Win Rate (12G)"
+                lbl_ref_kdr: "Avg KD Rank", lbl_ref_kr: "Avg Kill Rank",
+                lbl_ref_dr: "Troop Care Rank", lbl_ref_or: "Avg Obj Rank", lbl_ref_wr: "Win Rate (12G)"
             }
         };
 
         let currentLang = 'zh';
-        const HISTORY_KEY = 'ba_maggot_v36_history';
+        const HISTORY_KEY = 'ba_maggot_v37_history';
 
         function setLang(l) {
             currentLang = l; localStorage.setItem('ba_lang', l); updateUIStrings();
@@ -201,7 +190,6 @@
             document.getElementById('lbl_avg_range').innerText = t.avg_range;
             document.getElementById('lbl_maggot_range').innerText = t.maggot_range;
             document.getElementById('lbl_history_title').innerText = t.history_title;
-            document.getElementById('lbl_old_ver').innerText = t.old_ver;
             document.getElementById('lbl_ref_kdr').innerText = t.lbl_ref_kdr;
             document.getElementById('lbl_ref_kr').innerText = t.lbl_ref_kr;
             document.getElementById('lbl_ref_dr').innerText = t.lbl_ref_dr;
@@ -267,15 +255,16 @@
 
             try {
                 let uid = input;
+                let userData = null;
                 if (input.length > 10 || isNaN(input)) {
                     updateProgress(5, "Resolving...", "Checking Identity...");
-                    const sData = await robustFetch(`https://www.barmory.net/stb/commander/${input}/steam`);
-                    uid = String(sData.id);
+                    userData = await robustFetch(`https://www.barmory.net/stb/commander/${input}/steam`);
+                    uid = String(userData.id);
                 }
 
                 updateProgress(10, "Scanning...", "Pulling Matches...");
-                const time = new Date().toISOString().split('T')[0] + '_' + new Date().getHours().toString().padStart(2,'0');
-                const matchList = await robustFetch(`https://www.barmory.net/stb/commander/${uid}/matches?time=${time}`);
+                const timeStr = new Date().toISOString().split('T')[0] + '_' + new Date().getHours().toString().padStart(2,'0');
+                const matchList = await robustFetch(`https://www.barmory.net/stb/commander/${uid}/matches?time=${timeStr}`);
                 
                 const validMatches = [];
                 for(let i=0; i < matchList.length && validMatches.length < CONFIG.MATCH_GOAL; i++) {
@@ -295,7 +284,13 @@
 
                 if(validMatches.length < CONFIG.MATCH_GOAL) throw new Error(t.err_insufficient);
                 
-                saveHistory(uid, validMatches[0].data.Data[uid]?.Name);
+                const finalMe = validMatches[0].data.Data[uid];
+                saveHistory(uid, finalMe?.Name);
+                
+                // 设置 UI 上的用户信息
+                document.getElementById('userNameDisplay').innerText = `${finalMe?.Name || 'Unknown'} ${finalMe?.Level ? '(Lv.' + finalMe.Level + ')' : ''}`;
+                document.getElementById('calcTimeDisplay').innerText = `Calculated: ${new Date().toLocaleString()}`;
+
                 processFinalData(uid, validMatches);
 
             } catch (e) {
@@ -339,7 +334,8 @@
                 kRankSum += ([...ally].sort((a,b)=>b.kScore - a.kScore).findIndex(p=>p.isMe) + 1);
                 oRankSum += ([...ally].sort((a,b)=>b.oScore - a.oScore).findIndex(p=>p.isMe) + 1);
                 kdRankSum += ([...ally].sort((a,b)=>b.kd - a.kd).findIndex(p=>p.isMe) + 1);
-                lossRankSum += ([...ally].sort((a,b)=>b.lScore - a.lScore).findIndex(p=>p.isMe) + 1);
+                // 爱兵如子排名：损失越小(a.lScore - b.lScore)越靠前
+                lossRankSum += ([...ally].sort((a,b)=>a.lScore - b.lScore).findIndex(p=>p.isMe) + 1);
 
                 return { id: m.id, myRank: ally.findIndex(p => p.isMe) + 1, ally, enemy };
             });
@@ -349,8 +345,13 @@
         function renderResults(stats, avgKR, avgKDR, avgOR, avgDR, wins) {
             const t = DICT[currentLang];
             document.getElementById('resultPanel').classList.remove('hidden');
-            const avgRank = stats.reduce((a,b) => a + b.myRank, 0) / stats.length;
-            const maggotIndex = (1 + ((1 - Math.cos(Math.max(0, Math.min(1, (avgRank-1)/4)) * Math.PI)) / 2) * 9).toFixed(1);
+            
+            // --- 核心算法更新：余弦插值映射 -------------
+            const avgRank = stats.reduce((a,b) => a + b.myRank, 0) / stats.length; // 1-5 范围
+            const normalizedRank = (avgRank - 1) / 4; // 线性归一化到 0-1
+            const sCurveValue = (1 - Math.cos(normalizedRank * Math.PI)) / 2; // S型曲线平滑变换
+            const maggotIndex = (1 + (sCurveValue * 9)).toFixed(1); // 映射到 1-10 指数
+            // ----------------------------------------------------
 
             const display = document.getElementById('maggotScoreDisplay');
             display.innerText = maggotIndex;
